@@ -1,0 +1,23 @@
+{
+	"node": "n8n-nodes-base.nalpeironZentitle2",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Analytics & Tracking", "Developer Tools", "CRM"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://docs.nalpeiron.com/zentitle2-docs/ui-administration/api-credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://api.nalpeiron.io/docs"
+			}
+		]
+	},
+	"subcategories": {
+		"Analytics & Tracking": ["Growth Analytics", "User Analytics"],
+		"Developer Tools": ["API"],
+		"CRM": ["Customer Management", "Subscription Management"]
+	}
+}

@@ -1,0 +1,30 @@
+{
+  "lastUpdated": "2025-07-01T13:49:20.661Z",
+  "apiSource": {
+    "url": "https://api.nalpeiron.io/openapi/v1/2024-01-01/openapi.json",
+    "version": "2024-01-01:v1.0.1341"
+  },
+  "components": {
+    "NalpeironZentitle2": {
+      "generatedBy": "openapi-generator",
+      "resourceCount": 8,
+      "config": {
+        "methods": [
+          "GET"
+        ],
+        "excludedPatterns": [
+          "*subscription*",
+          "*insight*",
+          "*account*",
+          "*zengain*"
+        ]
+      },
+      "generatedAt": "2025-07-01T13:49:18.585Z"
+    },
+    "NalpeironZentitle2Trigger": {
+      "generatedBy": "webhook-generator",
+      "webhookEventCount": 17,
+      "generatedAt": "2025-07-01T13:49:20.661Z"
+    }
+  }
+}
