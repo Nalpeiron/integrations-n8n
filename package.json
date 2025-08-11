@@ -29,7 +29,7 @@
 	"scripts": {
 		"build": "npx rimraf dist && tsc && gulp build:icons",
 		"dev": "tsc --watch",
-		"format": "prettier nodes credentials --write",
+		"format": "prettier nodes credentials generators --write",
 		"lint": "eslint nodes credentials package.json",
 		"lint:fix": "eslint nodes credentials package.json --fix",
 		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json",

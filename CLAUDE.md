@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## OpenAPI Configuration
 
-- **API Source**: https://oriondev.api.nalpeiron-dev.com:8443/openapi/v1/2024-01-01/openapi.json
+- **API Source**: https://oriondev.api.nalpeiron-dev.com:8443/openapi/v1/2024-05-01-alpha/openapi.json
 - **Last Generated Version**: Will be displayed during generation process
 - **Generator**: Downloads OpenAPI spec dynamically, no local file storage required
 - **Product Configuration**: `generators/config/product-config.ts` - Shared configuration for both products
@@ -32,31 +32,37 @@ This is an n8n community node package for the Nalpeiron Growth Platform supporti
 ### Node Structure
 
 **Zentitle2 Nodes** (License Management Component):
+
 - **Main Node** (`Nalpeiron/Zentitle2/NalpeironZentitle2.node.ts`): Handles API operations for various resources (API clients, activations, customers, products, etc.)
 - **Trigger Node** (`Nalpeiron/Zentitle2/NalpeironZentitle2Trigger.node.ts`): Webhook-based trigger for real-time events
 
 **Zengain Nodes** (Customer Success Component):
+
 - **Main Node** (`Nalpeiron/Zengain/NalpeironZengain.node.ts`): Handles customer success and revenue optimization operations (customer lifecycle, account insights)
 - **Trigger Node** (`Nalpeiron/Zengain/NalpeironZengainTrigger.node.ts`): Webhook-based trigger for customer success events
 
 **Shared Components:**
+
 - **Credentials** (`NalpeironApi.credentials.ts`): OAuth2-based authentication with tenant support (shared by both Growth Platform components)
 
 ### Key Files
 
 **Zentitle2 Files:**
+
 - `nodes/Nalpeiron/Zentitle2/utils.ts` - Shared utilities for OAuth2 authentication and API requests
 - `nodes/Nalpeiron/Zentitle2/webhooks/` - Auto-generated webhook events and types
 - `nodes/Nalpeiron/Zentitle2/properties/` - Auto-generated n8n property definitions
 - `nodes/Nalpeiron/Zentitle2/resources/` - Auto-generated API resource handlers
 
 **Zengain Files:**
+
 - `nodes/Nalpeiron/Zengain/utils.ts` - Customer success and revenue optimization utilities (shared structure with Zentitle2)
 - `nodes/Nalpeiron/Zengain/webhooks/` - Auto-generated webhook events and types for customer lifecycle events
 - `nodes/Nalpeiron/Zengain/properties/` - Auto-generated n8n property definitions for customer success operations
 - `nodes/Nalpeiron/Zengain/resources/` - Auto-generated API resource handlers for customer and account management
 
 **Generator Files:**
+
 - `generators/` - OpenAPI-based code generation system
 - `generators/config/product-config.ts` - Shared configuration for both Growth Platform components (Zentitle2 and Zengain)
 - `generators/openapi-generator.ts` - Generates action nodes with `--product` flag support

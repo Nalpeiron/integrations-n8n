@@ -1,0 +1,2 @@
+# Generated template sources should not be formatted by Prettier
+generators/templates/**

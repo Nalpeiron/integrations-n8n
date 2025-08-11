@@ -55,22 +55,17 @@ export class WebhookEventGenerator {
 			await this.generateWebhookTypesFile(webhookEvents);
 
 			// Update version info - determine component name based on output directory
-			const componentName = this.outputDir?.includes('Zengain') 
+			const componentName = this.outputDir?.includes('Zengain')
 				? 'NalpeironZengainTrigger'
 				: 'NalpeironZentitle2Trigger';
 
-			await this.versionTracker.updateComponentVersion(
-				componentName,
-				finalUrl,
-				version,
-				{
-					generatedBy: 'webhook-generator',
-					webhookEventCount: webhookEvents.length,
-					config: {
-						includedTags: includeOnlyTags,
-					},
+			await this.versionTracker.updateComponentVersion(componentName, finalUrl, version, {
+				generatedBy: 'webhook-generator',
+				webhookEventCount: webhookEvents.length,
+				config: {
+					includedTags: includeOnlyTags,
 				},
-			);
+			});
 
 			console.log('✅ Webhook events generation completed!');
 		} finally {
@@ -90,9 +85,7 @@ export class WebhookEventGenerator {
 					// Filter by tags if specified
 					if (includeOnlyTags && includeOnlyTags.length > 0) {
 						const webhookTags = webhookPost.tags || [];
-						const hasRequiredTag = includeOnlyTags.some((tag: string) => 
-							webhookTags.includes(tag)
-						);
+						const hasRequiredTag = includeOnlyTags.some((tag: string) => webhookTags.includes(tag));
 						if (!hasRequiredTag) {
 							continue;
 						}
@@ -113,7 +106,10 @@ export class WebhookEventGenerator {
 		}
 
 		// Also extract webhook-related endpoints from regular paths if no x-webhooks section exists
-		if (openApiSpec.paths && (!openApiSpec['x-webhooks'] || Object.keys(openApiSpec['x-webhooks']).length === 0)) {
+		if (
+			openApiSpec.paths &&
+			(!openApiSpec['x-webhooks'] || Object.keys(openApiSpec['x-webhooks']).length === 0)
+		) {
 			for (const [pathPattern, pathInfo] of Object.entries(openApiSpec.paths)) {
 				if (!pathInfo || typeof pathInfo !== 'object') continue;
 
@@ -122,15 +118,16 @@ export class WebhookEventGenerator {
 
 					// Look for webhook-related tags
 					const operationTags = operation.tags || [];
-					const isWebhookEndpoint = operationTags.some((tag: string) => 
-						tag.toLowerCase().includes('webhook') || tag.toLowerCase().includes('trigger')
+					const isWebhookEndpoint = operationTags.some(
+						(tag: string) =>
+							tag.toLowerCase().includes('webhook') || tag.toLowerCase().includes('trigger'),
 					);
 
 					if (isWebhookEndpoint) {
 						// Filter by tags if specified
 						if (includeOnlyTags && includeOnlyTags.length > 0) {
-							const hasRequiredTag = includeOnlyTags.some((tag: string) => 
-								operationTags.includes(tag)
+							const hasRequiredTag = includeOnlyTags.some((tag: string) =>
+								operationTags.includes(tag),
 							);
 							if (!hasRequiredTag) {
 								continue;
@@ -138,11 +135,13 @@ export class WebhookEventGenerator {
 						}
 
 						// Generate event from webhook endpoint operation
-						const eventCode = operation.operationId || `${method}.${pathPattern.replace(/[^a-zA-Z0-9]/g, '.')}`;
+						const eventCode =
+							operation.operationId || `${method}.${pathPattern.replace(/[^a-zA-Z0-9]/g, '.')}`;
 						const event: WebhookEvent = {
 							eventCode,
 							name: operation.summary || this.formatEventName(eventCode),
-							description: operation.description || operation.summary || `Webhook event for ${eventCode}`,
+							description:
+								operation.description || operation.summary || `Webhook event for ${eventCode}`,
 							payloadSchema: this.extractPayloadSchema(operation),
 						};
 						webhookEvents.push(event);
@@ -216,17 +215,9 @@ export function isValidWebhookEvent(eventCode: string): boolean {
 }
 `;
 
-		const outputPath = this.outputDir 
+		const outputPath = this.outputDir
 			? path.join(this.outputDir, 'webhooks', 'events.ts')
-			: path.join(
-				__dirname,
-				'..',
-				'nodes',
-				'Nalpeiron',
-				'Zentitle2',
-				'webhooks',
-				'events.ts',
-			);
+			: path.join(__dirname, '..', 'nodes', 'Nalpeiron', 'Zentitle2', 'webhooks', 'events.ts');
 		await this.ensureDirectoryExists(path.dirname(outputPath));
 		await fs.writeFile(outputPath, fileContent);
 		console.log(`✓ Generated webhook events: ${outputPath}`);
@@ -305,17 +296,9 @@ export interface SeatWebhookPayload extends WebhookPayload {
 }
 `;
 
-		const outputPath = this.outputDir 
+		const outputPath = this.outputDir
 			? path.join(this.outputDir, 'webhooks', 'types.ts')
-			: path.join(
-				__dirname,
-				'..',
-				'nodes',
-				'Nalpeiron',
-				'Zentitle2',
-				'webhooks',
-				'types.ts',
-			);
+			: path.join(__dirname, '..', 'nodes', 'Nalpeiron', 'Zentitle2', 'webhooks', 'types.ts');
 		await this.ensureDirectoryExists(path.dirname(outputPath));
 		await fs.writeFile(outputPath, fileContent);
 		console.log(`✓ Generated webhook types: ${outputPath}`);
@@ -356,23 +339,30 @@ export interface SeatWebhookPayload extends WebhookPayload {
 	}
 }
 
-
 // CLI execution
 if (require.main === module) {
 	const args = process.argv.slice(2);
-	
+
 	// Parse CLI arguments
 	const productIndex = args.indexOf('--product');
-	const productName = productIndex !== -1 && args[productIndex + 1] ? args[productIndex + 1].toLowerCase() : undefined;
-	
+	const productName =
+		productIndex !== -1 && args[productIndex + 1]
+			? args[productIndex + 1].toLowerCase()
+			: undefined;
+
 	const openApiPathIndex = args.indexOf('--openapi-path');
-	const openApiPath = openApiPathIndex !== -1 && args[openApiPathIndex + 1] ? args[openApiPathIndex + 1] : DEFAULT_OPENAPI_URL;
-	
+	const openApiPath =
+		openApiPathIndex !== -1 && args[openApiPathIndex + 1]
+			? args[openApiPathIndex + 1]
+			: DEFAULT_OPENAPI_URL;
+
 	const tagsIndex = args.indexOf('--include-tags');
-	const includeTags = tagsIndex !== -1 && args[tagsIndex + 1] ? args[tagsIndex + 1].split(',') : undefined;
-	
+	const includeTags =
+		tagsIndex !== -1 && args[tagsIndex + 1] ? args[tagsIndex + 1].split(',') : undefined;
+
 	const outputIndex = args.indexOf('--output');
-	const customOutput = outputIndex !== -1 && args[outputIndex + 1] ? args[outputIndex + 1] : undefined;
+	const customOutput =
+		outputIndex !== -1 && args[outputIndex + 1] ? args[outputIndex + 1] : undefined;
 
 	// Apply product-based defaults
 	let finalTags = includeTags;
@@ -380,17 +370,17 @@ if (require.main === module) {
 
 	if (productName && PRODUCT_CONFIGS[productName]) {
 		const productConfig = PRODUCT_CONFIGS[productName];
-		
+
 		// Set tag if not explicitly provided
 		if (!includeTags) {
 			finalTags = [productConfig.tag];
 		}
-		
+
 		// Set output directory if not explicitly provided
 		if (!customOutput) {
 			outputDir = path.join(__dirname, '..', productConfig.outputDir);
 		}
-		
+
 		console.log(`🎯 Using product configuration: ${productConfig.displayName}`);
 	}
 

@@ -43,9 +43,7 @@ export class OpenAPIParser {
 				// Filter by tags if specified (include only operations with specified tags)
 				if (config?.includeOnlyTags && config.includeOnlyTags.length > 0) {
 					const operationTags = operation.tags || [];
-					const hasRequiredTag = config.includeOnlyTags.some(tag => 
-						operationTags.includes(tag)
-					);
+					const hasRequiredTag = config.includeOnlyTags.some((tag) => operationTags.includes(tag));
 					if (!hasRequiredTag) {
 						continue;
 					}
