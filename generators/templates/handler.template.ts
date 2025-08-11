@@ -3,7 +3,6 @@
 export class {{className}} extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
-		resource: string,
 		operation: string,
 		credentials: INalpeironCredentials,
 		accessToken: string,

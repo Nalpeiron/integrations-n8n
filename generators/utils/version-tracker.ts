@@ -10,6 +10,8 @@ export interface ApiVersionInfo {
 	components: {
 		NalpeironZentitle2?: ComponentInfo;
 		NalpeironZentitle2Trigger?: ComponentInfo;
+		NalpeironZengain?: ComponentInfo;
+		NalpeironZengainTrigger?: ComponentInfo;
 	};
 }
 
@@ -20,7 +22,8 @@ export interface ComponentInfo {
 	webhookEventCount?: number;
 	config?: {
 		methods?: string[];
-		excludedPatterns?: string[];
+		excludedResources?: string[];
+		includedTags?: string[];
 	};
 }
 
@@ -32,7 +35,7 @@ export class VersionTracker {
 	}
 
 	async updateComponentVersion(
-		componentName: 'NalpeironZentitle2' | 'NalpeironZentitle2Trigger',
+		componentName: 'NalpeironZentitle2' | 'NalpeironZentitle2Trigger' | 'NalpeironZengain' | 'NalpeironZengainTrigger',
 		apiUrl: string,
 		apiVersion: string,
 		componentInfo: Omit<ComponentInfo, 'generatedAt'>

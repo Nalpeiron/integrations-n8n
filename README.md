@@ -1,6 +1,6 @@
 # @nalpeiron/n8n-nodes-nalpeiron
 
-Automate your license management workflows with the [Nalpeiron Growth Platform](https://nalpeiron.com). This n8n community node lets you integrate license operations, customer management, and real-time notifications into your automation workflows.
+Automate your license management and customer success workflows with the [Nalpeiron Growth Platform](https://nalpeiron.com). This n8n community node lets you integrate both Zentitle2 (license operations) and Zengain (customer lifecycle management) components with real-time notifications into your automation workflows.
 
 ![Version](https://img.shields.io/npm/v/@nalpeiron/n8n-nodes-nalpeiron)
 ![Downloads](https://img.shields.io/npm/dm/@nalpeiron/n8n-nodes-nalpeiron)
@@ -31,23 +31,36 @@ Automate your license management workflows with the [Nalpeiron Growth Platform](
 
 ### 🔔 Real-Time Notifications
 
-Listen for 17 different webhook events including:
+Listen for webhook events from both Growth Platform components:
 
+**Zentitle2 Component Events**:
 - License creation, activation, and expiration
-- Customer lifecycle events
+- Customer lifecycle events  
 - Seat management notifications
 - Renewal and maintenance alerts
+
+**Zengain Component Events**:
+- Customer lifecycle changes (creation and updates) for revenue optimization and proactive customer success
 
 ## Use Cases
 
 Perfect for automating:
 
+**License Management (Zentitle2 Component):**
 - **License Monitoring**: Track license status and expiration dates across your organization
 - **Renewal Alerts**: Set up notifications for upcoming license expirations
 - **Usage Reporting**: Generate reports on license utilization and seat assignments
-- **Customer Insights**: Pull customer data for CRM and support systems
 - **Compliance Tracking**: Monitor license compliance and usage patterns
-- **Data Synchronization**: Keep external systems updated with license information
+
+**Customer Success & Revenue Growth (Zengain Component):**
+- **Revenue Optimization**: Identify upsell opportunities and at-risk accounts
+- **Proactive Customer Success**: Automate engagement based on customer lifecycle insights
+- **Sales Intelligence**: Sync customer behavior data to CRM systems for prioritized outreach
+- **Churn Prevention**: Set up automated workflows to address customer health signals
+
+**Integrated Growth Platform Workflows:**
+- **Data Synchronization**: Keep external systems updated with both license and customer success information from the Growth Platform
+- **Unified Customer View**: Combine Zentitle2 licensing data with Zengain customer success insights for complete customer intelligence
 
 ## Installation
 
@@ -105,19 +118,28 @@ The credentials include a built-in test function:
 
 ## Getting Started
 
-After installation, you'll find two new nodes in your n8n palette:
+After installation, you'll find four new nodes in your n8n palette:
 
+**Zentitle2 Nodes** (License Management Component):
 - **📊 Nalpeiron Zentitle2** - Retrieve license data (get licenses, customers, products, usage information)
 - **🔔 Nalpeiron Zentitle2 Trigger** - Listen for real-time events (license expiration, customer updates, renewals)
 
-**Note:** The Nalpeiron Zentitle2 node is also available as an AI tool for enhanced automation and intelligent workflows.
+**Zengain Nodes** (Customer Success Component):
+- **📊 Nalpeiron Zengain** - Access customer lifecycle data and account insights for revenue optimization
+- **🔔 Nalpeiron Zengain Trigger** - Listen for customer success events to drive proactive engagement
+
+**Note:** All Nalpeiron nodes are also available as AI tools for enhanced automation and intelligent workflows.
 
 ### Example Workflows
 
-**Renewal Alert System:**
-
+**License Renewal Alert (Zentitle2 Component):**
 ```
-Nalpeiron Trigger (license expires in 7 days) → Get Customer Details → Send Renewal Notice
+Nalpeiron Zentitle2 Trigger (license expires in 7 days) → Get Customer Details → Send Renewal Notice
+```
+
+**Customer Success Automation (Zengain Component):**
+```
+Nalpeiron Zengain Trigger (customer created) → Get Customer Insights → Update CRM with Revenue Opportunities
 ```
 
 ## Resources
@@ -132,7 +154,7 @@ The trigger node supports webhook events for real-time automation
 
 ### Basic Setup
 
-1. Add the **Nalpeiron Zentitle2 Trigger** node to your workflow
+1. Add either the **Nalpeiron Zentitle2 Trigger** or **Nalpeiron Zengain Trigger** node to your workflow
 2. Select the events you want to listen for (supports multiple selection)
 3. Webhooks are automatically registered
 4. The webhook URL is automatically configured

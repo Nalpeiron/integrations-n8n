@@ -1,10 +1,13 @@
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { getOAuth2AccessToken, INalpeironCredentials } from './utils';
-import { resourceHandlers } from './resources';
+import { BaseResourceHandler } from './base-resource-handler';
 
 export interface INodeCoordinator {
-	execute(context: IExecuteFunctions): Promise<INodeExecutionData[][]>;
+	execute(
+		context: IExecuteFunctions,
+		resourceHandlers: Record<string, BaseResourceHandler>,
+	): Promise<INodeExecutionData[][]>;
 }
 
 /**
@@ -15,7 +18,10 @@ export class NodeCoordinator implements INodeCoordinator {
 	/**
 	 * Execute the node operation
 	 */
-	async execute(context: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+	async execute(
+		context: IExecuteFunctions,
+		resourceHandlers: Record<string, BaseResourceHandler>,
+	): Promise<INodeExecutionData[][]> {
 		const items = context.getInputData();
 		const credentials = (await context.getCredentials('nalpeiron-Api')) as INalpeironCredentials;
 
@@ -23,7 +29,7 @@ export class NodeCoordinator implements INodeCoordinator {
 
 		for (let i = 0; i < items.length; i++) {
 			try {
-				const result = await this.executeItemOperation(context, credentials, i);
+				const result = await this.executeItemOperation(context, credentials, i, resourceHandlers);
 				returnData.push({
 					json: result,
 					pairedItem: {
@@ -54,6 +60,7 @@ export class NodeCoordinator implements INodeCoordinator {
 		context: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		itemIndex: number,
+		resourceHandlers: Record<string, BaseResourceHandler>,
 	): Promise<any> {
 		const resource = context.getNodeParameter('resource', itemIndex) as string;
 		const operation = context.getNodeParameter('operation', itemIndex) as string;
@@ -69,7 +76,6 @@ export class NodeCoordinator implements INodeCoordinator {
 
 		return await resourceHandler.executeOperation(
 			context,
-			resource,
 			operation,
 			credentials,
 			accessToken,

@@ -120,8 +120,8 @@ export interface GenerationConfig {
 	generateProperties: boolean; // Whether to generate property files
 	updateRegistry: boolean; // Whether to update registry files
 	allowedMethods?: string[]; // HTTP methods to include (e.g., ['GET'])
-	excludedResources?: string[]; // Resources to exclude (e.g., ['subscription', 'insight'])
-	excludedResourcePatterns?: string[]; // Resource patterns to exclude (e.g., ['*subscription*', '*insight*'])
+	excludedResources?: string[]; // Resources to exclude by exact name (e.g., ['tenant', 'subscription'])
+	includeOnlyTags?: string[]; // Only include operations with these OpenAPI tags (e.g., ['Zentitle', 'Zengain'])
 }
 
 // Template context types

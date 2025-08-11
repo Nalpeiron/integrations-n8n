@@ -26,42 +26,11 @@ export const customerProperties: INodeProperties[] = [
 				action: 'Get customer contacts',
 			},
 			{
-				name: 'Get Customer Notes',
-				value: 'getNotes',
-				description: 'This method returns customer note',
-				action: 'Get customer notes',
-			},
-			{
-				name: 'List Customer Contacts Credentials',
-				value: 'listContactsCredentials',
-				description:
-					'Return the credentials for a contact. If contact does not have credentials, Authentication field will be null...',
-				action: 'List customer contacts credentials',
-			},
-			{
-				name: 'List Customer Eup',
-				value: 'listEup',
-				description: 'This method returns customer End User Portal URL',
-				action: 'List customer eup',
-			},
-			{
-				name: 'List Customer Notes',
-				value: 'listNotes',
-				description: 'This method returns list of customer notes',
-				action: 'List customer notes',
-			},
-			{
 				name: 'List Customer Responsibility Owners',
 				value: 'listResponsibilityOwners',
 				description:
 					'Returns responsibility owners assigned to a customer (sales owner, customer success owner, and service owner)',
 				action: 'List customer responsibility owners',
-			},
-			{
-				name: 'List Customer Stats',
-				value: 'listStats',
-				description: 'Return zentitle statistic for a given customer',
-				action: 'List customer stats',
 			},
 			{
 				name: 'List Customers',
@@ -81,16 +50,7 @@ export const customerProperties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: [
-					'get',
-					'getContacts',
-					'listContactsCredentials',
-					'listEup',
-					'listNotes',
-					'getNotes',
-					'listResponsibilityOwners',
-					'listStats',
-				],
+				operation: ['get', 'getContacts', 'listResponsibilityOwners'],
 			},
 		},
 		default: '',
@@ -105,26 +65,11 @@ export const customerProperties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['getContacts', 'listContactsCredentials'],
+				operation: ['getContacts'],
 			},
 		},
 		default: '',
 		description: 'The contactId identifier',
-	},
-	// Note ID parameter
-	{
-		displayName: 'Note ID',
-		name: 'noteId',
-		type: 'string',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: ['customer'],
-				operation: ['getNotes'],
-			},
-		},
-		default: '',
-		description: 'The noteId identifier',
 	},
 	// Additional fields for list operations
 	{

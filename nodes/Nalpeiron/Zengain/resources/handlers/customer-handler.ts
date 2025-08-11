@@ -1,11 +1,10 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
-import { BaseResourceHandler } from '../base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../utils';
+import { BaseResourceHandler } from '../../../shared/base-resource-handler';
+import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';
 
-export class LocallicenseserverResourceHandler extends BaseResourceHandler {
+export class CustomerResourceHandler extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
-		resource: string,
 		operation: string,
 		credentials: INalpeironCredentials,
 		accessToken: string,
@@ -13,19 +12,19 @@ export class LocallicenseserverResourceHandler extends BaseResourceHandler {
 	): Promise<any> {
 		switch (operation) {
 			case 'list':
-				return this.listLocallicenseservers(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listCustomers(executeFunctions, credentials, accessToken, itemIndex);
 			case 'get':
-				return this.getLocallicenseserver(executeFunctions, credentials, accessToken, itemIndex);
-			case 'listConfig':
-				return this.listConfig(executeFunctions, credentials, accessToken, itemIndex);
-			case 'listEntitlement':
-				return this.listEntitlement(executeFunctions, credentials, accessToken, itemIndex);
+				return this.getCustomer(executeFunctions, credentials, accessToken, itemIndex);
+			case 'getContacts':
+				return this.getContacts(executeFunctions, credentials, accessToken, itemIndex);
+			case 'listResponsibilityOwners':
+				return this.listResponsibilityOwners(executeFunctions, credentials, accessToken, itemIndex);
 			default:
 				return this.handleUnknownOperation(operation, executeFunctions.getNode());
 		}
 	}
 
-	private async listLocallicenseservers(
+	private async listCustomers(
 		executeFunctions: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		accessToken: string,
@@ -40,7 +39,7 @@ export class LocallicenseserverResourceHandler extends BaseResourceHandler {
 
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/local-license-servers`,
+			`/api/v1/customers`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,
@@ -49,21 +48,44 @@ export class LocallicenseserverResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getLocallicenseserver(
+	private async getCustomer(
 		executeFunctions: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
-		const localLicenseServerId = this.getNodeParameter(
+		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
+
+		const additionalFields = this.getNodeParameter(
 			executeFunctions,
-			'localLicenseServerId',
+			'additionalFields',
 			itemIndex,
-		) as string;
+			{},
+		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/local-license-servers/${localLicenseServerId}`,
+			`/api/v1/customers/${customerId}`,
+			accessToken,
+			credentials,
+			executeFunctions.helpers,
+			undefined,
+			additionalFields,
+		);
+	}
+
+	private async getContacts(
+		executeFunctions: IExecuteFunctions,
+		credentials: INalpeironCredentials,
+		accessToken: string,
+		itemIndex: number,
+	): Promise<any> {
+		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
+		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
+
+		return await makeAuthenticatedRequest(
+			'GET',
+			`/api/v1/customers/${customerId}/contacts/${contactId}`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,
@@ -71,31 +93,17 @@ export class LocallicenseserverResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listConfig(
+	private async listResponsibilityOwners(
 		executeFunctions: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
-		return await makeAuthenticatedRequest(
-			'GET',
-			`/api/v1/local-license-servers/config`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
-			undefined,
-		);
-	}
+		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
-	private async listEntitlement(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/local-license-servers/entitlement`,
+			`/api/v1/customers/${customerId}/responsibility-owners`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,

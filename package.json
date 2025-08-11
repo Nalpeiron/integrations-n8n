@@ -6,6 +6,7 @@
 		"n8n-community-node-package",
 		"nalpeiron",
 		"zentitle2",
+		"zengain",
 		"license-management",
 		"software-licensing"
 	],
@@ -32,9 +33,13 @@
 		"lint": "eslint nodes credentials package.json",
 		"lint:fix": "eslint nodes credentials package.json --fix",
 		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
-		"generate:all": "npm run generate:zentitle && npm run generate:webhooks && npm run lint:fix && npm run format",
-		"generate:zentitle": "npx ts-node generators/openapi-generator.ts --get-only --exclude-zengain",
-		"generate:webhooks": "npx ts-node generators/webhook-generator.ts"
+		"generate:all": "npm run generate:actions && npm run generate:webhooks && npm run lint:fix && npm run format",
+		"generate:actions": "npm run generate:actions:zentitle && npm run generate:actions:zengain",
+		"generate:actions:zentitle": "npx ts-node generators/openapi-generator.ts --product zentitle",
+		"generate:actions:zengain": "npx ts-node generators/openapi-generator.ts --product zengain",
+		"generate:webhooks": "npm run generate:webhooks:zentitle && npm run generate:webhooks:zengain",
+		"generate:webhooks:zentitle": "npx ts-node generators/webhook-generator.ts --product zentitle",
+		"generate:webhooks:zengain": "npx ts-node generators/webhook-generator.ts --product zengain"
 	},
 	"files": [
 		"dist"
@@ -46,7 +51,9 @@
 		],
 		"nodes": [
 			"dist/nodes/Nalpeiron/Zentitle2/NalpeironZentitle2.node.js",
-			"dist/nodes/Nalpeiron/Zentitle2/NalpeironZentitle2Trigger.node.js"
+			"dist/nodes/Nalpeiron/Zentitle2/NalpeironZentitle2Trigger.node.js",
+			"dist/nodes/Nalpeiron/Zengain/NalpeironZengain.node.js",
+			"dist/nodes/Nalpeiron/Zengain/NalpeironZengainTrigger.node.js"
 		]
 	},
 	"devDependencies": {

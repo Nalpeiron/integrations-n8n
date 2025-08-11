@@ -14,7 +14,6 @@ export const RESOURCE_CONFIGS: IResourceConfig[] = [
 	{ name: 'Customer', value: 'customer' },
 	{ name: 'Entitlement', value: 'entitlement' },
 	{ name: 'Feature', value: 'feature' },
-	{ name: 'Local License Server', value: 'localLicenseServer' },
 	{ name: 'Offering', value: 'offering' },
 	{ name: 'Plan', value: 'plan' },
 	{ name: 'Product', value: 'product' },
@@ -44,11 +43,6 @@ export function getResourceOptions(): INodePropertyOptions[] {
 			name: 'Feature',
 			value: 'feature',
 			description: 'Manage global features',
-		},
-		{
-			name: 'Local License Server',
-			value: 'localLicenseServer',
-			description: 'Manage local license servers',
 		},
 		{
 			name: 'Offering',

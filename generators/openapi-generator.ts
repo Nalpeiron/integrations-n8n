@@ -7,6 +7,7 @@ import { TemplateEngine } from './utils/template-engine';
 import { OPENAPI_URL, OpenAPIDownloader } from './utils/openapi-downloader';
 import { VersionTracker } from './utils/version-tracker';
 import type { GeneratedResource, GenerationConfig } from './types/generator-types';
+import { DEFAULT_OPENAPI_URL, PRODUCT_CONFIGS } from './config/product-config';
 
 class OpenAPIGenerator {
 	private parser: OpenAPIParser;
@@ -65,13 +66,18 @@ class OpenAPIGenerator {
 				await this.updateRegistryFiles(resources);
 			}
 
-			// Update version info
-			await this.versionTracker.updateComponentVersion('NalpeironZentitle2', apiUrl, version, {
+			// Update version info - determine component name based on output directory
+			const componentName = this.outputDir.includes('Zengain')
+				? 'NalpeironZengain'
+				: 'NalpeironZentitle2';
+
+			await this.versionTracker.updateComponentVersion(componentName, apiUrl, version, {
 				generatedBy: 'openapi-generator',
 				resourceCount: resources.length,
 				config: {
 					methods: this.config.allowedMethods,
-					excludedPatterns: this.config.excludedResourcePatterns,
+					excludedResources: this.config.excludedResources,
+					includedTags: this.config.includeOnlyTags,
 				},
 			});
 
@@ -298,7 +304,7 @@ export function getResourceSelectionProperty(): INodeProperties {
 			.join('\n');
 
 		const newContent = `// Resource handler exports
-import { BaseResourceHandler } from './base-resource-handler';
+import { BaseResourceHandler } from '../../shared/base-resource-handler';
 ${imports}
 
 // Resource handler registry
@@ -400,8 +406,8 @@ export function getResourceConfig(resourceValue: string): IResourceConfig | unde
 		return this;
 	}
 
-	setExcludedResourcePatterns(patterns: string[]): this {
-		this.config.excludedResourcePatterns = patterns;
+	setIncludeOnlyTags(tags: string[]): this {
+		this.config.includeOnlyTags = tags;
 		return this;
 	}
 }
@@ -409,28 +415,82 @@ export function getResourceConfig(resourceValue: string): IResourceConfig | unde
 // CLI interface
 async function main() {
 	const args = process.argv.slice(2);
+
+	// Parse CLI arguments
+	const productIndex = args.indexOf('--product');
+	const productName =
+		productIndex !== -1 && args[productIndex + 1]
+			? args[productIndex + 1].toLowerCase()
+			: undefined;
+
+	const openApiPathIndex = args.indexOf('--openapi-path');
+	const openApiPath =
+		openApiPathIndex !== -1 && args[openApiPathIndex + 1]
+			? args[openApiPathIndex + 1]
+			: DEFAULT_OPENAPI_URL;
+
+	const tagsIndex = args.indexOf('--include-tags');
+	const includeTags =
+		tagsIndex !== -1 && args[tagsIndex + 1] ? args[tagsIndex + 1].split(',') : undefined;
+
+	const outputIndex = args.indexOf('--output');
+	const customOutput =
+		outputIndex !== -1 && args[outputIndex + 1] ? args[outputIndex + 1] : undefined;
+
+	const excludeResourcesIndex = args.indexOf('--exclude-resources');
+	let excludeResources =
+		excludeResourcesIndex !== -1 && args[excludeResourcesIndex + 1]
+			? args[excludeResourcesIndex + 1].split(',')
+			: undefined;
+
 	const getOnly = args.includes('--get-only');
-	const excludeZengain = args.includes('--exclude-zengain');
+	const disableDefaults = args.includes('--no-defaults');
 
-	const outputDir = path.join(__dirname, '..', 'nodes', 'Nalpeiron', 'Zentitle2');
+	// Apply product-based defaults
+	let finalTags = includeTags;
+	let outputDir: string;
 
-	const generator = new OpenAPIGenerator(outputDir);
+	if (productName && PRODUCT_CONFIGS[productName]) {
+		const productConfig = PRODUCT_CONFIGS[productName];
 
-	// Configure filtering based on CLI flags
-	if (getOnly) {
+		// Set tag if not explicitly provided
+		if (!includeTags) {
+			finalTags = [productConfig.tag];
+		}
+
+		// Set output directory if not explicitly provided
+		outputDir = customOutput || path.join(__dirname, '..', productConfig.outputDir);
+
+		// Set excluded resources if not explicitly provided and config has them
+		if (!excludeResources && productConfig.excludedResources) {
+			excludeResources = productConfig.excludedResources;
+		}
+
+		console.log(`🎯 Using product configuration: ${productConfig.displayName}`);
+	} else {
+		outputDir = customOutput || path.join(__dirname, '..', 'nodes', 'Nalpeiron', 'Zentitle2');
+	}
+
+	const generator = new OpenAPIGenerator(outputDir, openApiPath);
+
+	// Configure filtering based on CLI flags and defaults
+	const shouldApplyGetOnly = getOnly || (!disableDefaults && productName);
+	if (shouldApplyGetOnly) {
 		generator.setAllowedMethods(['GET']);
 		console.log('🔍 Filtering to GET methods only');
 	}
 
-	if (excludeZengain) {
-		generator.setExcludedResourcePatterns([
-			'*subscription*',
-			'*insight*',
-			'*account*',
-			'*zengain*',
-		]);
-		console.log('🚫 Excluding Zengain-related resources');
+	if (finalTags && finalTags.length > 0) {
+		generator.setIncludeOnlyTags(finalTags);
+		console.log(`🏷️  Including only tags: ${finalTags.join(', ')}`);
 	}
+
+	if (excludeResources && excludeResources.length > 0) {
+		generator.setExcludedResources(excludeResources);
+		console.log(`🚫 Excluding resources: ${excludeResources.join(', ')}`);
+	}
+
+	console.log(`🌐 Using OpenAPI URL: ${openApiPath}`);
 
 	try {
 		await generator.generate();

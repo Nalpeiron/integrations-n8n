@@ -111,7 +111,6 @@ export async function makeWebhookRequest(
 	return makeAuthenticatedRequest(method, endpoint, accessToken, credentials, helpers, body);
 }
 
-
 /**
  * Prepare response headers
  */

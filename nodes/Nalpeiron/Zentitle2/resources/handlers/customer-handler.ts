@@ -1,11 +1,10 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
-import { BaseResourceHandler } from '../base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../utils';
+import { BaseResourceHandler } from '../../../shared/base-resource-handler';
+import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';
 
 export class CustomerResourceHandler extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
-		resource: string,
 		operation: string,
 		credentials: INalpeironCredentials,
 		accessToken: string,
@@ -16,16 +15,20 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 				return this.listCustomers(executeFunctions, credentials, accessToken, itemIndex);
 			case 'get':
 				return this.getCustomer(executeFunctions, credentials, accessToken, itemIndex);
+			case 'getContacts':
+				return this.getContacts(executeFunctions, credentials, accessToken, itemIndex);
+			case 'listContactsCredentials':
+				return this.listContactsCredentials(executeFunctions, credentials, accessToken, itemIndex);
 			case 'listEup':
 				return this.listEup(executeFunctions, credentials, accessToken, itemIndex);
 			case 'listNotes':
 				return this.listNotes(executeFunctions, credentials, accessToken, itemIndex);
 			case 'getNotes':
 				return this.getNotes(executeFunctions, credentials, accessToken, itemIndex);
-			case 'listUsers':
-				return this.listUsers(executeFunctions, credentials, accessToken, itemIndex);
-			case 'getUsers':
-				return this.getUsers(executeFunctions, credentials, accessToken, itemIndex);
+			case 'listResponsibilityOwners':
+				return this.listResponsibilityOwners(executeFunctions, credentials, accessToken, itemIndex);
+			case 'listStats':
+				return this.listStats(executeFunctions, credentials, accessToken, itemIndex);
 			default:
 				return this.handleUnknownOperation(operation, executeFunctions.getNode());
 		}
@@ -78,6 +81,44 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 			executeFunctions.helpers,
 			undefined,
 			additionalFields,
+		);
+	}
+
+	private async getContacts(
+		executeFunctions: IExecuteFunctions,
+		credentials: INalpeironCredentials,
+		accessToken: string,
+		itemIndex: number,
+	): Promise<any> {
+		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
+		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
+
+		return await makeAuthenticatedRequest(
+			'GET',
+			`/api/v1/customers/${customerId}/contacts/${contactId}`,
+			accessToken,
+			credentials,
+			executeFunctions.helpers,
+			undefined,
+		);
+	}
+
+	private async listContactsCredentials(
+		executeFunctions: IExecuteFunctions,
+		credentials: INalpeironCredentials,
+		accessToken: string,
+		itemIndex: number,
+	): Promise<any> {
+		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
+		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
+
+		return await makeAuthenticatedRequest(
+			'GET',
+			`/api/v1/customers/${customerId}/contacts/${contactId}/credentials`,
+			accessToken,
+			credentials,
+			executeFunctions.helpers,
+			undefined,
 		);
 	}
 
@@ -136,7 +177,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listUsers(
+	private async listResponsibilityOwners(
 		executeFunctions: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		accessToken: string,
@@ -144,36 +185,27 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	): Promise<any> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
-		const additionalFields = this.getNodeParameter(
-			executeFunctions,
-			'additionalFields',
-			itemIndex,
-			{},
-		) as IDataObject;
-
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/customers/${customerId}/users`,
+			`/api/v1/customers/${customerId}/responsibility-owners`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,
 			undefined,
-			additionalFields,
 		);
 	}
 
-	private async getUsers(
+	private async listStats(
 		executeFunctions: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
-		const userId = this.getNodeParameter(executeFunctions, 'userId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/customers/${customerId}/users/${userId}`,
+			`/api/v1/customers/${customerId}/stats`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,

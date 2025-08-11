@@ -30,7 +30,7 @@ export const entitlementProperties: INodeProperties[] = [
 				name: 'Get Entitlement Groups',
 				value: 'getGroups',
 				description:
-					'This method returns entitlement group details. Amount of data returned can be adjusted by using query expand parameter c...',
+					'This method returns entitlement group details. The amount of data returned can be adjusted by using query expand paramet...',
 				action: 'Get entitlement groups',
 			},
 			{
@@ -60,10 +60,11 @@ export const entitlementProperties: INodeProperties[] = [
 				action: 'List entitlement groups',
 			},
 			{
-				name: 'List Entitlement Groups Authorized Users',
-				value: 'listGroupsAuthorizedUsers',
-				description: 'This method returns list of end users authorized for the entitlement group',
-				action: 'List entitlement groups authorized users',
+				name: 'List Entitlement Groups Authorized Contacts',
+				value: 'listGroupsAuthorizedContacts',
+				description:
+					'This method returns list of contacts (with ABL credentials) authorized for the entitlement group',
+				action: 'List entitlement groups authorized contacts',
 			},
 			{
 				name: 'List Entitlement Notes',
@@ -135,7 +136,7 @@ export const entitlementProperties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['entitlement'],
-				operation: ['getGroups', 'listGroupsAuthorizedUsers'],
+				operation: ['getGroups', 'listGroupsAuthorizedContacts'],
 			},
 		},
 		default: '',

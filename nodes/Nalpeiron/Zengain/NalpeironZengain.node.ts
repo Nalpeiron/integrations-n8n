@@ -2,19 +2,19 @@ import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflo
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { getAllNodeProperties } from './property-registry';
 import { nodeCoordinator } from '../shared/node-coordinator';
-import { resourceHandlers } from './resources';
+import { resourceHandlers } from '../Zengain/resources';
 
-export class NalpeironZentitle2 implements INodeType {
+export class NalpeironZengain implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Nalpeiron Zentitle2',
-		name: 'nalpeironZentitle2',
-		icon: 'file:zentitle.svg',
+		displayName: 'Nalpeiron Zengain',
+		name: 'nalpeironZengain',
+		icon: 'file:zengain.svg',
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-		description: 'Interact with Nalpeiron Zentitle2 API',
+		description: 'Interact with Nalpeiron Zengain API',
 		defaults: {
-			name: 'Nalpeiron Zentitle2',
+			name: 'Nalpeiron Zengain',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],
