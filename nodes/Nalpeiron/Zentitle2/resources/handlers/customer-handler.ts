@@ -25,8 +25,6 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 				return this.listNotes(executeFunctions, credentials, accessToken, itemIndex);
 			case 'getNotes':
 				return this.getNotes(executeFunctions, credentials, accessToken, itemIndex);
-			case 'listResponsibilityOwners':
-				return this.listResponsibilityOwners(executeFunctions, credentials, accessToken, itemIndex);
 			case 'listStats':
 				return this.listStats(executeFunctions, credentials, accessToken, itemIndex);
 			default:
@@ -170,24 +168,6 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		return await makeAuthenticatedRequest(
 			'GET',
 			`/api/v1/customers/${customerId}/notes/${noteId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
-			undefined,
-		);
-	}
-
-	private async listResponsibilityOwners(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
-		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
-
-		return await makeAuthenticatedRequest(
-			'GET',
-			`/api/v1/customers/${customerId}/responsibility-owners`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,

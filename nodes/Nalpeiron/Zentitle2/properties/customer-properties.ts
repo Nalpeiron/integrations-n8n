@@ -51,13 +51,6 @@ export const customerProperties: INodeProperties[] = [
 				action: 'List customer notes',
 			},
 			{
-				name: 'List Customer Responsibility Owners',
-				value: 'listResponsibilityOwners',
-				description:
-					'Returns responsibility owners assigned to a customer (sales owner, customer success owner, and service owner)',
-				action: 'List customer responsibility owners',
-			},
-			{
 				name: 'List Customer Stats',
 				value: 'listStats',
 				description: 'Return zentitle statistic for a given customer',
@@ -88,7 +81,6 @@ export const customerProperties: INodeProperties[] = [
 					'listEup',
 					'listNotes',
 					'getNotes',
-					'listResponsibilityOwners',
 					'listStats',
 				],
 			},
