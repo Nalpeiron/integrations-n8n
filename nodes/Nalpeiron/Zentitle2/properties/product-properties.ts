@@ -14,82 +14,82 @@ export const productProperties: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Get Edition',
+				value: 'getEditions',
+				description: 'This method returns product edition details',
+				action: 'Get edition',
+			},
+			{
+				name: 'Get Edition Attribute',
+				value: 'getEditionsAttributes',
+				description:
+					'This method returns selected attribute with value defined in edition level (in case of override). If no value is defined in edition level, value defined in higher level is returned.',
+				action: 'Get edition attribute',
+			},
+			{
+				name: 'Get Edition Attributes List',
+				value: 'listEditionsAttributes',
+				description: 'This method returns list of all attributes for selected edition',
+				action: 'Get edition attributes list',
+			},
+			{
+				name: 'Get Edition Feature',
+				value: 'getEditionsFeatures',
+				description:
+					'This method returns selected feature with value defined in edition level (in case of override). If no value is defined in edition level, value defined in higher level is returned.',
+				action: 'Get edition feature',
+			},
+			{
+				name: 'Get Edition Feature List',
+				value: 'listEditionsFeatures',
+				description: 'This method returns list of all features for selected edition',
+				action: 'Get edition feature list',
+			},
+			{
+				name: 'Get Edition List',
+				value: 'listEditions',
+				description:
+					'This method returns list of editions that can be filtered by following query parameters',
+				action: 'Get edition list',
+			},
+			{
 				name: 'Get Product',
 				value: 'get',
 				description: 'This method returns product details',
 				action: 'Get product',
 			},
 			{
-				name: 'Get Product Attributes',
+				name: 'Get Product Attribute',
 				value: 'getAttributes',
 				description:
-					'This method returns selected attribute. In case of global attribute, if overridden value exists on product level, it wil...',
-				action: 'Get product attributes',
+					'This method returns selected attribute. In case of global attribute, if overridden value exists on product level, it will be returned, otherwise global value will be returned.',
+				action: 'Get product attribute',
 			},
 			{
-				name: 'Get Product Editions',
-				value: 'getEditions',
-				description: 'This method returns product edition details',
-				action: 'Get product editions',
-			},
-			{
-				name: 'Get Product Editions Attributes',
-				value: 'getEditionsAttributes',
-				description:
-					'This method returns selected attribute with value defined in edition level (in case of override). If no value is defined...',
-				action: 'Get product editions attributes',
-			},
-			{
-				name: 'Get Product Editions Features',
-				value: 'getEditionsFeatures',
-				description:
-					'This method returns selected feature with value defined in edition level (in case of override). If no value is defined i...',
-				action: 'Get product editions features',
-			},
-			{
-				name: 'Get Product Features',
-				value: 'getFeatures',
-				description:
-					'This method returns selected feature. In case of global feature, if overridden value exists on product level, it will be...',
-				action: 'Get product features',
-			},
-			{
-				name: 'List Product Attributes',
+				name: 'Get Product Attributes List',
 				value: 'listAttributes',
 				description: 'This method returns list of all attributes for selected product',
-				action: 'List product attributes',
+				action: 'Get product attributes list',
 			},
 			{
-				name: 'List Product Editions',
-				value: 'listEditions',
+				name: 'Get Product Feature',
+				value: 'getFeatures',
 				description:
-					'This method returns list of editions that can be filtered by following query parameters',
-				action: 'List product editions',
+					'This method returns selected feature. In case of global feature, if overridden value exists on product level, it will be returned, otherwise global value will be returned.',
+				action: 'Get product feature',
 			},
 			{
-				name: 'List Product Editions Attributes',
-				value: 'listEditionsAttributes',
-				description: 'This method returns list of all attributes for selected edition',
-				action: 'List product editions attributes',
-			},
-			{
-				name: 'List Product Editions Features',
-				value: 'listEditionsFeatures',
-				description: 'This method returns list of all features for selected edition',
-				action: 'List product editions features',
-			},
-			{
-				name: 'List Product Features',
+				name: 'Get Product Features List',
 				value: 'listFeatures',
 				description: 'This method returns list of all features for selected product',
-				action: 'List product features',
+				action: 'Get product features list',
 			},
 			{
-				name: 'List Products',
+				name: 'Get Product List',
 				value: 'list',
 				description:
 					'This method returns list of products that can be filtered by following query parameters',
-				action: 'List products',
+				action: 'Get product list',
 			},
 		],
 		default: 'list',

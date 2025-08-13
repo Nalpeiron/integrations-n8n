@@ -20,11 +20,11 @@ export const offeringProperties: INodeProperties[] = [
 				action: 'Get offering',
 			},
 			{
-				name: 'List Offerings',
+				name: 'Get Offering List',
 				value: 'list',
 				description:
 					'This method returns list of offering that can be filtered by following query parameters',
-				action: 'List offerings',
+				action: 'Get offering list',
 			},
 		],
 		default: 'list',

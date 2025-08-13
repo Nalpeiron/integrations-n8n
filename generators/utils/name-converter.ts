@@ -146,54 +146,10 @@ export class NameConverter {
 	}
 
 	/**
-	 * Generate operation display name from operation type and resource
-	 */
-	toOperationDisplayName(operation: string, resourceDisplayName: string): string {
-		const baseOperations: Record<string, string> = {
-			get: 'Get',
-			list: 'List',
-			create: 'Create',
-			update: 'Update',
-			delete: 'Delete',
-		};
-
-		// Handle basic operations
-		if (baseOperations[operation]) {
-			const verb = baseOperations[operation];
-			if (operation === 'list') {
-				return `${verb} ${this.toPlural(resourceDisplayName)}`;
-			}
-			return `${verb} ${resourceDisplayName}`;
-		}
-
-		// Handle compound operations like listActivations, getGroups, etc.
-		for (const [baseOp, verb] of Object.entries(baseOperations)) {
-			if (operation.startsWith(baseOp)) {
-				// Extract the suffix (e.g., "Activations" from "listActivations")
-				const suffix = operation.slice(baseOp.length);
-				if (suffix) {
-					// Convert to display name (e.g., "Activations" -> "Activations")
-					const suffixDisplay = this.toDisplayName(suffix);
-
-					if (baseOp === 'list') {
-						return `${verb} ${resourceDisplayName} ${suffixDisplay}`;
-					} else {
-						return `${verb} ${resourceDisplayName} ${suffixDisplay}`;
-					}
-				}
-			}
-		}
-
-		// Fallback for unknown operations
-		return this.toDisplayName(operation);
-	}
-
-	/**
 	 * Generate operation action text for n8n (sentence case)
 	 */
-	toOperationAction(operation: string, resourceDisplayName: string): string {
-		const displayName = this.toOperationDisplayName(operation, resourceDisplayName);
+	toOperationAction(resourceDisplayName: string): string {
 		// Convert to sentence case: first letter uppercase, rest lowercase
-		return displayName.charAt(0).toUpperCase() + displayName.slice(1).toLowerCase();
+		return resourceDisplayName.charAt(0).toUpperCase() + resourceDisplayName.slice(1).toLowerCase();
 	}
 }

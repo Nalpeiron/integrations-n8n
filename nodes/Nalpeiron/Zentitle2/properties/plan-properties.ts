@@ -20,11 +20,11 @@ export const planProperties: INodeProperties[] = [
 				action: 'Get plan',
 			},
 			{
-				name: 'List Plans',
+				name: 'Get Plan List',
 				value: 'list',
 				description:
 					'This method returns list of plans that can be filtered by following query parameters',
-				action: 'List plans',
+				action: 'Get plan list',
 			},
 		],
 		default: 'list',

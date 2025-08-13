@@ -14,16 +14,16 @@ export const attributeProperties: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Get Attribute',
+				name: 'Get Global Attribute',
 				value: 'get',
 				description: 'This method returns selected global attribute',
-				action: 'Get attribute',
+				action: 'Get global attribute',
 			},
 			{
-				name: 'List Attributes',
+				name: 'Get Global Attributes List',
 				value: 'list',
 				description: 'This method returns list of all attributes',
-				action: 'List attributes',
+				action: 'Get global attributes list',
 			},
 		],
 		default: 'list',

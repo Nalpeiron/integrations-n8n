@@ -82,6 +82,7 @@ export async function makeAuthenticatedRequest(
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
 			'N-TenantId': credentials.tenantId,
+			'N-Api-Version': '2024-05-01-alpha',
 		},
 		json: true,
 	};

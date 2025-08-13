@@ -14,70 +14,70 @@ export const entitlementProperties: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Get Activation State',
+				value: 'getActivations',
+				description:
+					'This method returns activation details including information about attributes and available features',
+				action: 'Get activation state',
+			},
+			{
+				name: 'Get an Entitlement Group',
+				value: 'getGroups',
+				description:
+					'This method returns entitlement group details. The amount of data returned can be adjusted by using query expand parameter configuration.',
+				action: 'Get an entitlement group',
+			},
+			{
 				name: 'Get Entitlement',
 				value: 'get',
 				description: 'This method returns entitlement details',
 				action: 'Get entitlement',
 			},
 			{
-				name: 'Get Entitlement Activations',
-				value: 'getActivations',
-				description:
-					'This method returns activation details including information about attributes and available features',
-				action: 'Get entitlement activations',
-			},
-			{
-				name: 'Get Entitlement Groups',
-				value: 'getGroups',
-				description:
-					'This method returns entitlement group details. The amount of data returned can be adjusted by using query expand paramet...',
-				action: 'Get entitlement groups',
-			},
-			{
-				name: 'Get Entitlement Notes',
-				value: 'getNotes',
-				description: 'This method returns entitlement note',
-				action: 'Get entitlement notes',
-			},
-			{
-				name: 'List Entitlement Activations',
-				value: 'listActivations',
-				description:
-					'This method returns list of entitlement activation that can be filtered by following query parameters',
-				action: 'List entitlement activations',
-			},
-			{
-				name: 'List Entitlement Activations Log',
-				value: 'listActivationsLog',
-				description: 'This method returns log of activations activity on the entitlement',
-				action: 'List entitlement activations log',
-			},
-			{
-				name: 'List Entitlement Groups',
-				value: 'listGroups',
-				description:
-					'This method returns entitlement group list. Amount of data returned can be adjusted by using query expand parameter conf...',
-				action: 'List entitlement groups',
-			},
-			{
-				name: 'List Entitlement Groups Authorized Contacts',
+				name: 'Get Entitlement Group Authorized Contacts',
 				value: 'listGroupsAuthorizedContacts',
 				description:
 					'This method returns list of contacts (with ABL credentials) authorized for the entitlement group',
-				action: 'List entitlement groups authorized contacts',
+				action: 'Get entitlement group authorized contacts',
 			},
 			{
-				name: 'List Entitlement Notes',
-				value: 'listNotes',
-				description: 'This method returns list of entitlement notes',
-				action: 'List entitlement notes',
+				name: 'Get Entitlement Group List',
+				value: 'listGroups',
+				description:
+					'This method returns entitlement group list. Amount of data returned can be adjusted by using query expand parameter configuration.',
+				action: 'Get entitlement group list',
 			},
 			{
-				name: 'List Entitlements',
+				name: 'Get Entitlement List',
 				value: 'list',
 				description:
 					'This method returns list of entitlements that can be filtered by following query parameters',
-				action: 'List entitlements',
+				action: 'Get entitlement list',
+			},
+			{
+				name: 'Get Entitlement Note',
+				value: 'getNotes',
+				description: 'This method returns entitlement note',
+				action: 'Get entitlement note',
+			},
+			{
+				name: 'Get Entitlement Note List',
+				value: 'listNotes',
+				description: 'This method returns list of entitlement notes',
+				action: 'Get entitlement note list',
+			},
+			{
+				name: 'List of Entitlement Activations',
+				value: 'listActivations',
+				description:
+					'This method returns list of entitlement activation that can be filtered by following query parameters',
+				action: 'List of entitlement activations',
+			},
+			{
+				name: 'Log of Activations Activity',
+				value: 'listActivationsLog',
+				description: 'This method returns log of activations activity on the entitlement',
+				action: 'Log of activations activity',
 			},
 		],
 		default: 'list',

@@ -174,11 +174,8 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../s
 		const sortedOperations = resource.operations
 			.map((operation) => ({
 				operation,
-				displayName: this.nameConverter.toOperationDisplayName(
-					operation.name,
-					resource.displayName,
-				),
-				action: this.nameConverter.toOperationAction(operation.name, resource.displayName),
+				displayName: operation.displayName,
+				action: this.nameConverter.toOperationAction(operation.displayName),
 				sanitizedDescription: this.sanitizeDescription(operation.description),
 			}))
 			.sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -502,7 +499,7 @@ ${options}
 				// Remove final period to comply with ESLint rules
 				.replace(/\.$/, '')
 				// Limit length to avoid overly long descriptions
-				.substring(0, 120) + (description.length > 120 ? '...' : '')
+				.substring(0, 240) + (description.length > 240 ? '...' : '')
 		);
 	}
 }

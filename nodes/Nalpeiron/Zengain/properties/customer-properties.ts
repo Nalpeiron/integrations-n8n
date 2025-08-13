@@ -20,23 +20,23 @@ export const customerProperties: INodeProperties[] = [
 				action: 'Get customer',
 			},
 			{
-				name: 'Get Customer Contacts',
+				name: 'Get Customer Contact',
 				value: 'getContacts',
 				description: 'This method returns selected customer contact details',
-				action: 'Get customer contacts',
+				action: 'Get customer contact',
 			},
 			{
-				name: 'List Customer Responsibility Owners',
+				name: 'Get Customer List',
+				value: 'list',
+				description: 'This method returns list of customers',
+				action: 'Get customer list',
+			},
+			{
+				name: 'Get Customer Responsibility Owners',
 				value: 'listResponsibilityOwners',
 				description:
 					'Returns responsibility owners assigned to a customer (sales owner, customer success owner, and service owner)',
-				action: 'List customer responsibility owners',
-			},
-			{
-				name: 'List Customers',
-				value: 'list',
-				description: 'This method returns list of customers',
-				action: 'List customers',
+				action: 'Get customer responsibility owners',
 			},
 		],
 		default: 'list',
