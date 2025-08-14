@@ -1,6 +1,6 @@
 {
 	"name": "@nalpeiron/n8n-nodes-nalpeiron",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "n8n community node for Nalpeiron Growth Platform",
 	"keywords": [
 		"n8n-community-node-package",
