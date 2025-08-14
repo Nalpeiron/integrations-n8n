@@ -7,6 +7,10 @@ export interface ProductConfig {
 	outputDir: string;
 	displayName: string;
 	excludedResources?: string[];
+	excludedOperations?: {
+		[resourceName: string]: string[]; // Array of operationIds to exclude from specific resources
+	};
+	excludedWebhooks?: string[]; // Array of eventCodes to exclude from webhook generation
 }
 
 export const PRODUCT_CONFIGS: Record<string, ProductConfig> = {

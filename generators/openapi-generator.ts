@@ -77,6 +77,7 @@ class OpenAPIGenerator {
 				config: {
 					methods: this.config.allowedMethods,
 					excludedResources: this.config.excludedResources,
+					excludedOperations: this.config.excludedOperations,
 					includedTags: this.config.includeOnlyTags,
 				},
 			});
@@ -406,6 +407,18 @@ export function getResourceConfig(resourceValue: string): IResourceConfig | unde
 		return this;
 	}
 
+	setExcludedOperations(operations: { [resourceName: string]: string[] }): this {
+		// Convert resource names to lowercase for consistent matching
+		this.config.excludedOperations = Object.keys(operations).reduce(
+			(acc, resourceName) => {
+				acc[resourceName.toLowerCase()] = operations[resourceName];
+				return acc;
+			},
+			{} as { [resourceName: string]: string[] },
+		);
+		return this;
+	}
+
 	setIncludeOnlyTags(tags: string[]): this {
 		this.config.includeOnlyTags = tags;
 		return this;
@@ -449,6 +462,7 @@ async function main() {
 	// Apply product-based defaults
 	let finalTags = includeTags;
 	let outputDir: string;
+	let excludedOperations: { [resourceName: string]: string[] } | undefined;
 
 	if (productName && PRODUCT_CONFIGS[productName]) {
 		const productConfig = PRODUCT_CONFIGS[productName];
@@ -465,6 +479,9 @@ async function main() {
 		if (!excludeResources && productConfig.excludedResources) {
 			excludeResources = productConfig.excludedResources;
 		}
+
+		// Pass excluded operations from product config
+		excludedOperations = productConfig.excludedOperations;
 
 		console.log(`🎯 Using product configuration: ${productConfig.displayName}`);
 	} else {
@@ -488,6 +505,17 @@ async function main() {
 	if (excludeResources && excludeResources.length > 0) {
 		generator.setExcludedResources(excludeResources);
 		console.log(`🚫 Excluding resources: ${excludeResources.join(', ')}`);
+	}
+
+	if (excludedOperations && Object.keys(excludedOperations).length > 0) {
+		generator.setExcludedOperations(excludedOperations);
+		const operationCount = Object.values(excludedOperations).reduce(
+			(total: number, ops: string[]) => total + ops.length,
+			0,
+		);
+		console.log(
+			`🚫 Excluding ${operationCount} operations from ${Object.keys(excludedOperations).join(', ')} resources`,
+		);
 	}
 
 	console.log(`🌐 Using OpenAPI URL: ${openApiPath}`);
