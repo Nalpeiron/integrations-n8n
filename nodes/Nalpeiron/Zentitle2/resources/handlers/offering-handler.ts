@@ -1,11 +1,10 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
-import { BaseResourceHandler } from '../base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../utils';
+import { BaseResourceHandler } from '../../../shared/base-resource-handler';
+import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';
 
 export class OfferingResourceHandler extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
-		resource: string,
 		operation: string,
 		credentials: INalpeironCredentials,
 		accessToken: string,

@@ -40,6 +40,15 @@ export class OpenAPIParser {
 					continue;
 				}
 
+				// Filter by tags if specified (include only operations with specified tags)
+				if (config?.includeOnlyTags && config.includeOnlyTags.length > 0) {
+					const operationTags = operation.tags || [];
+					const hasRequiredTag = config.includeOnlyTags.some((tag) => operationTags.includes(tag));
+					if (!hasRequiredTag) {
+						continue;
+					}
+				}
+
 				const resourceInfo = this.extractResourceFromPath(pathPattern, method, operation);
 				if (!resourceInfo) continue;
 
@@ -432,19 +441,6 @@ export class OpenAPIParser {
 		// Check exact resource name matches
 		if (config.excludedResources?.includes(resourceName.toLowerCase())) {
 			return true;
-		}
-
-		// Check pattern matches
-		if (config.excludedResourcePatterns) {
-			for (const pattern of config.excludedResourcePatterns) {
-				// Convert glob-like pattern to regex
-				const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.');
-
-				const regex = new RegExp(`^${regexPattern}$`, 'i');
-				if (regex.test(resourceName)) {
-					return true;
-				}
-			}
 		}
 
 		return false;

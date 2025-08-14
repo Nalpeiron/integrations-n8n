@@ -5,21 +5,21 @@ import {
 	INodeTypeDescription,
 	NodeConnectionType,
 } from 'n8n-workflow';
+import { handleStandardWebhook } from '../shared/webhook-handler';
 import { createWebhookMethods } from '../shared/webhook-methods';
 import { WEBHOOK_EVENT_OPTIONS } from './webhooks/events';
-import { handleStandardWebhook } from '../shared/webhook-handler';
 
-export class NalpeironZentitle2Trigger implements INodeType {
+export class NalpeironZengainTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Nalpeiron Zentitle2 Trigger',
-		name: 'nalpeironZentitle2Trigger',
-		icon: 'file:zentitle.svg',
+		displayName: 'Nalpeiron Zengain Trigger',
+		name: 'nalpeironZengainTrigger',
+		icon: 'file:zengain.svg',
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["event"]}}',
-		description: 'Handle webhooks from Nalpeiron Zentitle2',
+		description: 'Handle webhooks from Nalpeiron Zengain',
 		defaults: {
-			name: 'Nalpeiron Zentitle2 Trigger',
+			name: 'Nalpeiron Zengain Trigger',
 		},
 		inputs: [],
 		outputs: [NodeConnectionType.Main],
@@ -44,7 +44,7 @@ export class NalpeironZentitle2Trigger implements INodeType {
 				type: 'multiOptions',
 				required: true,
 				default: [],
-				description: 'The events to listen for',
+				description: 'Events to listen to',
 				options: WEBHOOK_EVENT_OPTIONS,
 			},
 		],

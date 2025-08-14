@@ -1,11 +1,10 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
-import { BaseResourceHandler } from '../base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../utils';
+import { BaseResourceHandler } from '../../../shared/base-resource-handler';
+import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';
 
 export class EntitlementResourceHandler extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
-		resource: string,
 		operation: string,
 		credentials: INalpeironCredentials,
 		accessToken: string,
@@ -30,8 +29,8 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 				return this.listGroups(executeFunctions, credentials, accessToken, itemIndex);
 			case 'getGroups':
 				return this.getGroups(executeFunctions, credentials, accessToken, itemIndex);
-			case 'listGroupsAuthorizedUsers':
-				return this.listGroupsAuthorizedUsers(
+			case 'listGroupsAuthorizedContacts':
+				return this.listGroupsAuthorizedContacts(
 					executeFunctions,
 					credentials,
 					accessToken,
@@ -277,7 +276,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listGroupsAuthorizedUsers(
+	private async listGroupsAuthorizedContacts(
 		executeFunctions: IExecuteFunctions,
 		credentials: INalpeironCredentials,
 		accessToken: string,
@@ -298,7 +297,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/entitlements/groups/${entitlementGroupId}/authorized-users`,
+			`/api/v1/entitlements/groups/${entitlementGroupId}/authorized-contacts`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,

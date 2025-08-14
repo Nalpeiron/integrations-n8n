@@ -1,16 +1,19 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
+type ComponentName =
+	| 'NalpeironZentitle2'
+	| 'NalpeironZentitle2Trigger'
+	| 'NalpeironZengain'
+	| 'NalpeironZengainTrigger';
+
 export interface ApiVersionInfo {
 	lastUpdated: string;
 	apiSource: {
 		url: string;
 		version: string;
 	};
-	components: {
-		NalpeironZentitle2?: ComponentInfo;
-		NalpeironZentitle2Trigger?: ComponentInfo;
-	};
+	components: Partial<Record<ComponentName, ComponentInfo>>;
 }
 
 export interface ComponentInfo {
@@ -20,7 +23,8 @@ export interface ComponentInfo {
 	webhookEventCount?: number;
 	config?: {
 		methods?: string[];
-		excludedPatterns?: string[];
+		excludedResources?: string[];
+		includedTags?: string[];
 	};
 }
 
@@ -32,10 +36,10 @@ export class VersionTracker {
 	}
 
 	async updateComponentVersion(
-		componentName: 'NalpeironZentitle2' | 'NalpeironZentitle2Trigger',
+		componentName: ComponentName,
 		apiUrl: string,
 		apiVersion: string,
-		componentInfo: Omit<ComponentInfo, 'generatedAt'>
+		componentInfo: Omit<ComponentInfo, 'generatedAt'>,
 	): Promise<void> {
 		console.log(`📋 Updating version info for ${componentName}...`);
 
@@ -48,7 +52,7 @@ export class VersionTracker {
 			versionInfo = {
 				lastUpdated: new Date().toISOString(),
 				apiSource: { url: apiUrl, version: apiVersion },
-				components: {}
+				components: {},
 			};
 		}
 
@@ -59,12 +63,12 @@ export class VersionTracker {
 		// Update component info
 		versionInfo.components[componentName] = {
 			...componentInfo,
-			generatedAt: new Date().toISOString()
+			generatedAt: new Date().toISOString(),
 		};
 
 		// Write updated version info
 		await fs.writeFile(this.versionFilePath, JSON.stringify(versionInfo, null, 2));
-		
+
 		console.log(`✅ Updated version info: ${componentName} generated from API ${apiVersion}`);
 	}
 

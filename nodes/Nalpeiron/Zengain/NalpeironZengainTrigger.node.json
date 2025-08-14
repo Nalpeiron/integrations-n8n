@@ -1,0 +1,23 @@
+{
+	"node": "n8n-nodes-base.nalpeironZengainTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Analytics & Tracking", "Developer Tools", "CRM"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://docs.nalpeiron.com/zentitle2-docs/ui-administration/api-credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://docs.nalpeiron.com/zentitle2-docs/ui-administration/webhooks"
+			}
+		]
+	},
+	"subcategories": {
+		"Analytics & Tracking": ["Growth Analytics", "User Analytics"],
+		"Developer Tools": ["Webhooks", "API"],
+		"CRM": ["Customer Management", "Subscription Management"]
+	}
+}

@@ -2,7 +2,8 @@ import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 
-export const OPENAPI_URL = 'https://api.nalpeiron.io/openapi/v1/2024-01-01/openapi.json';
+export const OPENAPI_URL =
+	'https://oriondev.api.nalpeiron-dev.com:8443/openapi/v1/2024-05-01-alpha/openapi.json';
 
 export interface OpenAPISpec {
 	spec: any;

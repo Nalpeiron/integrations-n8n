@@ -62,8 +62,8 @@ export class TemplateEngine {
 			: `import type { IExecuteFunctions } from 'n8n-workflow';`;
 
 		return `${imports}
-import { BaseResourceHandler } from '../base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../utils';`;
+import { BaseResourceHandler } from '../../../shared/base-resource-handler';
+import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';`;
 	}
 
 	private generateOperationCases(resource: GeneratedResource): string {
@@ -174,11 +174,8 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../util
 		const sortedOperations = resource.operations
 			.map((operation) => ({
 				operation,
-				displayName: this.nameConverter.toOperationDisplayName(
-					operation.name,
-					resource.displayName,
-				),
-				action: this.nameConverter.toOperationAction(operation.name, resource.displayName),
+				displayName: operation.displayName,
+				action: this.nameConverter.toOperationAction(operation.displayName),
 				sanitizedDescription: this.sanitizeDescription(operation.description),
 			}))
 			.sort((a, b) => a.displayName.localeCompare(b.displayName));
@@ -239,6 +236,8 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../util
 		param: OperationParameter,
 		operations: string[],
 	): string {
+		const description = this.formatDescription(param.description, param.type);
+
 		return `\t// ${param.displayName} parameter
 \t{
 \t\tdisplayName: '${param.displayName}',
@@ -252,7 +251,7 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../util
 \t\t\t},
 \t\t},
 \t\tdefault: '',
-\t\tdescription: '${this.sanitizeDescription(param.description)}',
+\t\tdescription: '${this.sanitizeDescription(description)}',
 \t},`;
 	}
 
@@ -345,12 +344,14 @@ ${options}
 	}
 
 	private generateQueryParameterOption(param: OperationParameter): string {
+		const description = this.formatDescription(param.description, param.type);
+
 		return `\t\t\t{
 \t\t\t\tdisplayName: '${param.displayName}',
 \t\t\t\tname: '${param.name}',
 \t\t\t\ttype: '${param.type}',
 \t\t\t\tdefault: '',
-\t\t\t\tdescription: '${this.sanitizeDescription(param.description)}',
+\t\t\t\tdescription: '${this.sanitizeDescription(description)}',
 \t\t\t},`;
 	}
 
@@ -444,6 +445,34 @@ ${options}
 	}
 
 	/**
+	 * Format description according to n8n conventions
+	 */
+	private formatDescription(description: string, type?: string): string {
+		if (!description) return '';
+
+		// For boolean types, description should start with "Whether"
+		if (type === 'boolean') {
+			const cleanDesc = description.trim();
+			if (!cleanDesc.toLowerCase().startsWith('whether')) {
+				// Transform common boolean patterns
+				if (cleanDesc.toLowerCase().startsWith('include ')) {
+					return `Whether to ${cleanDesc.toLowerCase()}`;
+				} else if (
+					cleanDesc.toLowerCase().startsWith('enable ') ||
+					cleanDesc.toLowerCase().startsWith('disable ')
+				) {
+					return `Whether to ${cleanDesc.toLowerCase()}`;
+				} else {
+					// Generic transformation
+					return `Whether ${cleanDesc.toLowerCase()}`;
+				}
+			}
+		}
+
+		return description;
+	}
+
+	/**
 	 * Sanitize description text for use in TypeScript strings
 	 */
 	private sanitizeDescription(description: string): string {
@@ -470,7 +499,7 @@ ${options}
 				// Remove final period to comply with ESLint rules
 				.replace(/\.$/, '')
 				// Limit length to avoid overly long descriptions
-				.substring(0, 120) + (description.length > 120 ? '...' : '')
+				.substring(0, 240) + (description.length > 240 ? '...' : '')
 		);
 	}
 }

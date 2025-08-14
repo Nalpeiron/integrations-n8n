@@ -14,16 +14,16 @@ export const featureProperties: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Get Feature',
+				name: 'Get Global Feature',
 				value: 'get',
 				description: 'This method returns selected global feature',
-				action: 'Get feature',
+				action: 'Get global feature',
 			},
 			{
-				name: 'List Features',
+				name: 'Get Global Features List',
 				value: 'list',
 				description: 'This method returns list of all global features',
-				action: 'List features',
+				action: 'Get global features list',
 			},
 		],
 		default: 'list',

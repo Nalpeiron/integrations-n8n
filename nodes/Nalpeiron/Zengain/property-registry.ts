@@ -1,12 +1,6 @@
 import type { INodeProperties } from 'n8n-workflow';
 import { getResourceOptions } from './resource-config';
-import { attributeProperties } from './properties/attribute-properties';
 import { customerProperties } from './properties/customer-properties';
-import { entitlementProperties } from './properties/entitlement-properties';
-import { featureProperties } from './properties/feature-properties';
-import { offeringProperties } from './properties/offering-properties';
-import { planProperties } from './properties/plan-properties';
-import { productProperties } from './properties/product-properties';
 
 // Import only the generated property modules (filtered for GET only, excluding Zengain)
 
@@ -22,13 +16,7 @@ export interface IPropertyRegistry {
 class PropertyRegistry implements IPropertyRegistry {
 	private readonly resourcePropertiesMap: Record<string, INodeProperties[]> = {
 		// Generated properties for each resource
-		attribute: attributeProperties,
 		customer: customerProperties,
-		entitlement: entitlementProperties,
-		feature: featureProperties,
-		offering: offeringProperties,
-		plan: planProperties,
-		product: productProperties,
 	};
 	/**
 	 * Get the main resource selection property

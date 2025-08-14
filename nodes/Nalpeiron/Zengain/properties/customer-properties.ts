@@ -14,13 +14,6 @@ export const customerProperties: INodeProperties[] = [
 		},
 		options: [
 			{
-				name: 'Get Contact Credentials',
-				value: 'listContactsCredentials',
-				description:
-					'Return the credentials for a contact. If contact does not have credentials, Authentication field will be null.',
-				action: 'Get contact credentials',
-			},
-			{
 				name: 'Get Customer',
 				value: 'get',
 				description: 'This method returns selected customer',
@@ -33,34 +26,17 @@ export const customerProperties: INodeProperties[] = [
 				action: 'Get customer contact',
 			},
 			{
-				name: 'Get Customer End User Portal URL',
-				value: 'listEup',
-				description: 'This method returns customer End User Portal URL',
-				action: 'Get customer end user portal url',
-			},
-			{
 				name: 'Get Customer List',
 				value: 'list',
 				description: 'This method returns list of customers',
 				action: 'Get customer list',
 			},
 			{
-				name: 'Get Customer Note',
-				value: 'getNotes',
-				description: 'This method returns customer note',
-				action: 'Get customer note',
-			},
-			{
-				name: 'Get Customer Note List',
-				value: 'listNotes',
-				description: 'This method returns list of customer notes',
-				action: 'Get customer note list',
-			},
-			{
-				name: 'Get Customer Zentitle Statistic',
-				value: 'listStats',
-				description: 'Return zentitle statistic for a given customer',
-				action: 'Get customer zentitle statistic',
+				name: 'Get Customer Responsibility Owners',
+				value: 'listResponsibilityOwners',
+				description:
+					'Returns responsibility owners assigned to a customer (sales owner, customer success owner, and service owner)',
+				action: 'Get customer responsibility owners',
 			},
 		],
 		default: 'list',
@@ -74,15 +50,7 @@ export const customerProperties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: [
-					'get',
-					'getContacts',
-					'listContactsCredentials',
-					'listEup',
-					'listNotes',
-					'getNotes',
-					'listStats',
-				],
+				operation: ['get', 'getContacts', 'listResponsibilityOwners'],
 			},
 		},
 		default: '',
@@ -97,26 +65,11 @@ export const customerProperties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['getContacts', 'listContactsCredentials'],
+				operation: ['getContacts'],
 			},
 		},
 		default: '',
 		description: 'The contactId identifier',
-	},
-	// Note ID parameter
-	{
-		displayName: 'Note ID',
-		name: 'noteId',
-		type: 'string',
-		required: true,
-		displayOptions: {
-			show: {
-				resource: ['customer'],
-				operation: ['getNotes'],
-			},
-		},
-		default: '',
-		description: 'The noteId identifier',
 	},
 	// Additional fields for list operations
 	{
