@@ -29,7 +29,11 @@ export class WebhookEventGenerator {
 		this.versionTracker = new VersionTracker();
 	}
 
-	async generateWebhookEvents(openApiUrl?: string, includeOnlyTags?: string[]): Promise<void> {
+	async generateWebhookEvents(
+		openApiUrl?: string,
+		includeOnlyTags?: string[],
+		excludedWebhooks?: string[],
+	): Promise<void> {
 		console.log('🎯 Generating webhook events from OpenAPI spec...');
 
 		const finalUrl = openApiUrl || this.openApiUrl || OPENAPI_URL;
@@ -44,7 +48,11 @@ export class WebhookEventGenerator {
 		console.log(`📋 Using OpenAPI spec version: ${version}`);
 
 		try {
-			const webhookEvents = this.extractWebhookEvents(openApiSpec, includeOnlyTags);
+			const webhookEvents = this.extractWebhookEvents(
+				openApiSpec,
+				includeOnlyTags,
+				excludedWebhooks,
+			);
 			console.log(`📊 Found ${webhookEvents.length} webhook events`);
 
 			if (includeOnlyTags && includeOnlyTags.length > 0) {
@@ -64,6 +72,7 @@ export class WebhookEventGenerator {
 				webhookEventCount: webhookEvents.length,
 				config: {
 					includedTags: includeOnlyTags,
+					excludedWebhooks: excludedWebhooks,
 				},
 			});
 
@@ -74,7 +83,11 @@ export class WebhookEventGenerator {
 		}
 	}
 
-	private extractWebhookEvents(openApiSpec: any, includeOnlyTags?: string[]): WebhookEvent[] {
+	private extractWebhookEvents(
+		openApiSpec: any,
+		includeOnlyTags?: string[],
+		excludedWebhooks?: string[],
+	): WebhookEvent[] {
 		const webhookEvents: WebhookEvent[] = [];
 
 		// Extract from x-webhooks section
@@ -89,6 +102,11 @@ export class WebhookEventGenerator {
 						if (!hasRequiredTag) {
 							continue;
 						}
+					}
+
+					// Skip if webhook is excluded
+					if (excludedWebhooks && excludedWebhooks.includes(eventCode)) {
+						continue;
 					}
 
 					const event: WebhookEvent = {
@@ -137,6 +155,12 @@ export class WebhookEventGenerator {
 						// Generate event from webhook endpoint operation
 						const eventCode =
 							operation.operationId || `${method}.${pathPattern.replace(/[^a-zA-Z0-9]/g, '.')}`;
+
+						// Skip if webhook is excluded
+						if (excludedWebhooks && excludedWebhooks.includes(eventCode)) {
+							continue;
+						}
+
 						const event: WebhookEvent = {
 							eventCode,
 							name: operation.summary || this.formatEventName(eventCode),
@@ -367,6 +391,7 @@ if (require.main === module) {
 	// Apply product-based defaults
 	let finalTags = includeTags;
 	let outputDir: string | undefined = customOutput;
+	let excludedWebhooks: string[] | undefined;
 
 	if (productName && PRODUCT_CONFIGS[productName]) {
 		const productConfig = PRODUCT_CONFIGS[productName];
@@ -381,14 +406,22 @@ if (require.main === module) {
 			outputDir = path.join(__dirname, '..', productConfig.outputDir);
 		}
 
+		// Set excluded webhooks from product config
+		excludedWebhooks = productConfig.excludedWebhooks;
+
 		console.log(`🎯 Using product configuration: ${productConfig.displayName}`);
 	}
 
 	if (finalTags && finalTags.length > 0) {
 		console.log(`🏷️  Including only tags: ${finalTags.join(', ')}`);
 	}
+
+	if (excludedWebhooks && excludedWebhooks.length > 0) {
+		console.log(`🚫 Excluding ${excludedWebhooks.length} webhooks: ${excludedWebhooks.join(', ')}`);
+	}
+
 	console.log(`🌐 Using OpenAPI URL: ${openApiPath}`);
 
 	const generator = new WebhookEventGenerator(outputDir, openApiPath);
-	generator.generateWebhookEvents(undefined, finalTags).catch(console.error);
+	generator.generateWebhookEvents(undefined, finalTags, excludedWebhooks).catch(console.error);
 }

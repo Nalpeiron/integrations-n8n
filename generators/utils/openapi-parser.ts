@@ -75,6 +75,14 @@ export class OpenAPIParser {
 					resourceInfo,
 				);
 
+				// Skip if operation is excluded
+				if (
+					config &&
+					this.isOperationExcluded(resourceInfo.resourceName, resourceOperation.operationId, config)
+				) {
+					continue;
+				}
+
 				// Check if we already have an operation with this name
 				const existingOperation = resource.operations.find(
 					(op) => op.name === resourceOperation.name,
@@ -444,6 +452,23 @@ export class OpenAPIParser {
 		}
 
 		return false;
+	}
+
+	private isOperationExcluded(
+		resourceName: string,
+		operationId: string | undefined,
+		config: GenerationConfig,
+	): boolean {
+		if (!config.excludedOperations || !operationId) {
+			return false;
+		}
+
+		const resourceExclusions = config.excludedOperations[resourceName.toLowerCase()];
+		if (!resourceExclusions) {
+			return false;
+		}
+
+		return resourceExclusions.includes(operationId);
 	}
 
 	private isValidResource(resource: GeneratedResource): boolean {

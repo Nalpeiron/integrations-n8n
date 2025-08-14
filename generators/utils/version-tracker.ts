@@ -24,7 +24,11 @@ export interface ComponentInfo {
 	config?: {
 		methods?: string[];
 		excludedResources?: string[];
+		excludedOperations?: {
+			[resourceName: string]: string[];
+		};
 		includedTags?: string[];
+		excludedWebhooks?: string[];
 	};
 }
 
