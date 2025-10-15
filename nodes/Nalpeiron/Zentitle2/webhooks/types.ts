@@ -33,6 +33,8 @@ export type WebhookEventCode =
 	| 'entitlement.expires1day'
 	| 'entitlement.expires30days'
 	| 'entitlement.expires7days'
+	| 'entitlement.group.created'
+	| 'entitlement.group.updated'
 	| 'entitlement.maintenance.expired'
 	| 'entitlement.maintenance.expires1day'
 	| 'entitlement.maintenance.expires30days'
@@ -41,7 +43,8 @@ export type WebhookEventCode =
 	| 'entitlement.renewed'
 	| 'entitlement.seat.activated'
 	| 'entitlement.seat.deactivated'
-	| 'entitlement.updated';
+	| 'entitlement.updated'
+	| 'entitlement.usage.summary';
 
 /**
  * Generic payload interface for all webhook events

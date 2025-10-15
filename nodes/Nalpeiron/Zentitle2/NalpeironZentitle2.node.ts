@@ -1,4 +1,4 @@
-import { INodeType, INodeTypeDescription, NodeConnectionType } from 'n8n-workflow';
+import { INodeType, INodeTypeDescription, NodeConnectionTypes } from 'n8n-workflow';
 import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { getAllNodeProperties } from './property-registry';
 import { nodeCoordinator } from '../shared/node-coordinator';
@@ -16,8 +16,8 @@ export class NalpeironZentitle2 implements INodeType {
 		defaults: {
 			name: 'Nalpeiron Zentitle2',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		usableAsTool: true,
 		credentials: [
 			{

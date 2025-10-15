@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { OPENAPI_URL, OpenAPIDownloader } from './utils/openapi-downloader';
+import { OpenAPIDownloader } from './utils/openapi-downloader';
 import { VersionTracker } from './utils/version-tracker';
 import { DEFAULT_OPENAPI_URL, PRODUCT_CONFIGS } from './config/product-config';
 
@@ -36,7 +36,7 @@ export class WebhookEventGenerator {
 	): Promise<void> {
 		console.log('🎯 Generating webhook events from OpenAPI spec...');
 
-		const finalUrl = openApiUrl || this.openApiUrl || OPENAPI_URL;
+		const finalUrl = openApiUrl || this.openApiUrl || DEFAULT_OPENAPI_URL;
 
 		// Download OpenAPI specification
 		const {

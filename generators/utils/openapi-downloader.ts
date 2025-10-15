@@ -1,9 +1,7 @@
 import * as fs from 'fs/promises';
 import * as os from 'os';
 import * as path from 'path';
-
-export const OPENAPI_URL =
-	'https://oriondev.api.nalpeiron-dev.com:8443/openapi/v1/2024-05-01-alpha/openapi.json';
+import { DEFAULT_OPENAPI_URL } from '../config/product-config';
 
 export interface OpenAPISpec {
 	spec: any;
@@ -12,7 +10,7 @@ export interface OpenAPISpec {
 }
 
 export class OpenAPIDownloader {
-	async downloadSpec(url: string = OPENAPI_URL): Promise<OpenAPISpec> {
+	async downloadSpec(url: string = DEFAULT_OPENAPI_URL): Promise<OpenAPISpec> {
 		console.log(`📥 Downloading OpenAPI spec from: ${url}`);
 
 		// Download the spec

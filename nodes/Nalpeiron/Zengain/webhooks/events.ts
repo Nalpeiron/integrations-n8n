@@ -14,11 +14,6 @@ export const WEBHOOK_EVENT_OPTIONS = [
 		value: 'customer.updated',
 		description: 'Event generated when customer was successfully updated',
 	},
-	{
-		name: 'Insight Created',
-		value: 'insight.created',
-		description: 'Event generated when Zengain insight was created',
-	},
 ];
 
 /**

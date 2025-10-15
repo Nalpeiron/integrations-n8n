@@ -14,6 +14,12 @@ export const customerProperties: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Get a Customer Contact List',
+				value: 'listContacts',
+				description: 'This method returns a list of customer contacts',
+				action: 'Get a customer contact list',
+			},
+			{
 				name: 'Get Contact Credentials',
 				value: 'listContactsCredentials',
 				description:
@@ -23,7 +29,7 @@ export const customerProperties: INodeProperties[] = [
 			{
 				name: 'Get Customer',
 				value: 'get',
-				description: 'This method returns selected customer',
+				description: 'This method returns the selected customer',
 				action: 'Get customer',
 			},
 			{
@@ -76,6 +82,7 @@ export const customerProperties: INodeProperties[] = [
 				resource: ['customer'],
 				operation: [
 					'get',
+					'listContacts',
 					'getContacts',
 					'listContactsCredentials',
 					'listEup',

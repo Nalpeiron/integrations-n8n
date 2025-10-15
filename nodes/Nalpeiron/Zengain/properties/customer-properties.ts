@@ -14,9 +14,15 @@ export const customerProperties: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Get a Customer Contact List',
+				value: 'listContacts',
+				description: 'This method returns a list of customer contacts',
+				action: 'Get a customer contact list',
+			},
+			{
 				name: 'Get Customer',
 				value: 'get',
-				description: 'This method returns selected customer',
+				description: 'This method returns the selected customer',
 				action: 'Get customer',
 			},
 			{
@@ -31,13 +37,6 @@ export const customerProperties: INodeProperties[] = [
 				description: 'This method returns list of customers',
 				action: 'Get customer list',
 			},
-			{
-				name: 'Get Customer Responsibility Owners',
-				value: 'listResponsibilityOwners',
-				description:
-					'Returns responsibility owners assigned to a customer (sales owner, customer success owner, and service owner)',
-				action: 'Get customer responsibility owners',
-			},
 		],
 		default: 'list',
 	},
@@ -50,7 +49,7 @@ export const customerProperties: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['customer'],
-				operation: ['get', 'getContacts', 'listResponsibilityOwners'],
+				operation: ['get', 'listContacts', 'getContacts'],
 			},
 		},
 		default: '',

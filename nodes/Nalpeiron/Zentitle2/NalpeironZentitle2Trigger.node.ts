@@ -3,7 +3,7 @@ import {
 	IWebhookResponseData,
 	INodeType,
 	INodeTypeDescription,
-	NodeConnectionType,
+	NodeConnectionTypes,
 } from 'n8n-workflow';
 import { createWebhookMethods } from '../shared/webhook-methods';
 import { WEBHOOK_EVENT_OPTIONS } from './webhooks/events';
@@ -22,7 +22,7 @@ export class NalpeironZentitle2Trigger implements INodeType {
 			name: 'Nalpeiron Zentitle2 Trigger',
 		},
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionTypes.Main],
 		webhooks: [
 			{
 				name: 'default',
