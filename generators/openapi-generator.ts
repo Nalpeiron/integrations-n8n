@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { OpenAPIParser } from './utils/openapi-parser';
 import { TemplateEngine } from './utils/template-engine';
-import { OPENAPI_URL, OpenAPIDownloader } from './utils/openapi-downloader';
+import { OpenAPIDownloader } from './utils/openapi-downloader';
 import { VersionTracker } from './utils/version-tracker';
 import type { GeneratedResource, GenerationConfig } from './types/generator-types';
 import { DEFAULT_OPENAPI_URL, PRODUCT_CONFIGS } from './config/product-config';
@@ -43,7 +43,7 @@ class OpenAPIGenerator {
 
 		console.log(`📋 Using OpenAPI spec version: ${version}`);
 
-		const apiUrl = this.openApiUrl || OPENAPI_URL;
+		const apiUrl = this.openApiUrl || DEFAULT_OPENAPI_URL;
 
 		try {
 			// Clean generated directories

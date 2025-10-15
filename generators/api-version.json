@@ -1,8 +1,8 @@
 {
-	"lastUpdated": "2025-08-13T14:17:39.709Z",
+	"lastUpdated": "2025-10-15T09:52:36.849Z",
 	"apiSource": {
-		"url": "https://oriondev.api.nalpeiron-dev.com:8443/openapi/v1/2024-05-01-alpha/openapi.json",
-		"version": "2024-05-01-alpha:v1.0"
+		"url": "https://api.nalpeiron.io/openapi/v1/2025-10-10/openapi.json",
+		"version": "2025-10-10:v1.0.1593"
 	},
 	"components": {
 		"NalpeironZentitle2": {
@@ -11,17 +11,20 @@
 			"config": {
 				"methods": ["GET"],
 				"excludedResources": ["tenant", "abl", "account", "locallicenseserver"],
+				"excludedOperations": {
+					"entitlement": ["EntitlementGroup_GetLicenseFile"]
+				},
 				"includedTags": ["Zentitle"]
 			},
-			"generatedAt": "2025-08-13T14:17:35.792Z"
+			"generatedAt": "2025-10-15T09:52:29.932Z"
 		},
 		"NalpeironZentitle2Trigger": {
 			"generatedBy": "webhook-generator",
-			"webhookEventCount": 17,
+			"webhookEventCount": 20,
 			"config": {
 				"includedTags": ["Zentitle"]
 			},
-			"generatedAt": "2025-08-13T14:17:38.503Z"
+			"generatedAt": "2025-10-15T09:52:34.650Z"
 		},
 		"NalpeironZengain": {
 			"generatedBy": "openapi-generator",
@@ -31,15 +34,15 @@
 				"excludedResources": ["account", "insight", "product", "subscription"],
 				"includedTags": ["Zengain"]
 			},
-			"generatedAt": "2025-08-13T14:17:37.119Z"
+			"generatedAt": "2025-10-15T09:52:32.254Z"
 		},
 		"NalpeironZengainTrigger": {
 			"generatedBy": "webhook-generator",
-			"webhookEventCount": 3,
+			"webhookEventCount": 2,
 			"config": {
 				"includedTags": ["Zengain"]
 			},
-			"generatedAt": "2025-08-13T14:17:39.710Z"
+			"generatedAt": "2025-10-15T09:52:36.850Z"
 		}
 	}
 }

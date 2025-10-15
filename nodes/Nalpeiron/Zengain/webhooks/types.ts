@@ -24,7 +24,7 @@ export interface WebhookEvent<T = any> extends WebhookEventBase {
 /**
  * Webhook event codes as union type
  */
-export type WebhookEventCode = 'customer.created' | 'customer.updated' | 'insight.created';
+export type WebhookEventCode = 'customer.created' | 'customer.updated';
 
 /**
  * Generic payload interface for all webhook events

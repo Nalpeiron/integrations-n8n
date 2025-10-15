@@ -14,6 +14,13 @@ export const productProperties: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Get a Product List',
+				value: 'list',
+				description:
+					'This method returns a list of products that can be filtered by following query parameters',
+				action: 'Get a product list',
+			},
+			{
 				name: 'Get Edition',
 				value: 'getEditions',
 				description: 'This method returns product edition details',
@@ -83,13 +90,6 @@ export const productProperties: INodeProperties[] = [
 				value: 'listFeatures',
 				description: 'This method returns list of all features for selected product',
 				action: 'Get product features list',
-			},
-			{
-				name: 'Get Product List',
-				value: 'list',
-				description:
-					'This method returns list of products that can be filtered by following query parameters',
-				action: 'Get product list',
 			},
 		],
 		default: 'list',

@@ -45,6 +45,16 @@ export const WEBHOOK_EVENT_OPTIONS = [
 		description: 'Event generated when entitlement is going to expire in 7 days',
 	},
 	{
+		name: 'Entitlement Group Created',
+		value: 'entitlement.group.created',
+		description: 'Event generated when entitlement group was successfully created',
+	},
+	{
+		name: 'Entitlement Group Updated',
+		value: 'entitlement.group.updated',
+		description: 'Event generated when entitlement group was updated',
+	},
+	{
 		name: 'Entitlement Maintenance Expired',
 		value: 'entitlement.maintenance.expired',
 		description: 'Event generated when entitlement maintenance has expired',
@@ -89,6 +99,12 @@ export const WEBHOOK_EVENT_OPTIONS = [
 		name: 'Entitlement Updated',
 		value: 'entitlement.updated',
 		description: 'Event generated when entitlement was updated',
+	},
+	{
+		name: 'Entitlement Usage Summary',
+		value: 'entitlement.usage.summary',
+		description:
+			'Event generated when an entitlement usage summary is available after a usage reset',
 	},
 ];
 

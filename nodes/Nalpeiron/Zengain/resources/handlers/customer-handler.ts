@@ -15,10 +15,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 				return this.listCustomers(executeFunctions, credentials, accessToken, itemIndex);
 			case 'get':
 				return this.getCustomer(executeFunctions, credentials, accessToken, itemIndex);
+			case 'listContacts':
+				return this.listContacts(executeFunctions, credentials, accessToken, itemIndex);
 			case 'getContacts':
 				return this.getContacts(executeFunctions, credentials, accessToken, itemIndex);
-			case 'listResponsibilityOwners':
-				return this.listResponsibilityOwners(executeFunctions, credentials, accessToken, itemIndex);
 			default:
 				return this.handleUnknownOperation(operation, executeFunctions.getNode());
 		}
@@ -56,6 +56,24 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	): Promise<any> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
+		return await makeAuthenticatedRequest(
+			'GET',
+			`/api/v1/customers/${customerId}`,
+			accessToken,
+			credentials,
+			executeFunctions.helpers,
+			undefined,
+		);
+	}
+
+	private async listContacts(
+		executeFunctions: IExecuteFunctions,
+		credentials: INalpeironCredentials,
+		accessToken: string,
+		itemIndex: number,
+	): Promise<any> {
+		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
+
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -65,7 +83,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 
 		return await makeAuthenticatedRequest(
 			'GET',
-			`/api/v1/customers/${customerId}`,
+			`/api/v1/customers/${customerId}/contacts`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,
@@ -86,24 +104,6 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		return await makeAuthenticatedRequest(
 			'GET',
 			`/api/v1/customers/${customerId}/contacts/${contactId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
-			undefined,
-		);
-	}
-
-	private async listResponsibilityOwners(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
-		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
-
-		return await makeAuthenticatedRequest(
-			'GET',
-			`/api/v1/customers/${customerId}/responsibility-owners`,
 			accessToken,
 			credentials,
 			executeFunctions.helpers,

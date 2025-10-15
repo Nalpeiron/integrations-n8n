@@ -20,7 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## OpenAPI Configuration
 
-- **API Source**: https://oriondev.api.nalpeiron-dev.com:8443/openapi/v1/2024-05-01-alpha/openapi.json
+- **API Source**: https://api.nalpeiron.io/openapi/v1/2025-10-10/openapi.json
 - **Last Generated Version**: Will be displayed during generation process
 - **Generator**: Downloads OpenAPI spec dynamically, no local file storage required
 - **Product Configuration**: `generators/config/product-config.ts` - Shared configuration for both products
