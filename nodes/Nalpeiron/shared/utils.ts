@@ -1,4 +1,4 @@
-import { IRequestOptions, IDataObject, NodeOperationError, INode } from 'n8n-workflow';
+import { IHttpRequestOptions, IDataObject, NodeOperationError, INode } from 'n8n-workflow';
 
 export interface INalpeironCredentials {
 	baseUrl: string;
@@ -10,7 +10,7 @@ export interface INalpeironCredentials {
 }
 
 export interface IRequestHelpers {
-	request: (options: IRequestOptions) => Promise<any>;
+	request: (options: IHttpRequestOptions) => Promise<any>;
 }
 
 /**
@@ -26,7 +26,7 @@ export async function getOAuth2AccessToken(
 		credentials.clientId,
 	)}&client_secret=${encodeURIComponent(credentials.clientSecret)}`;
 
-	const options: IRequestOptions = {
+	const options: IHttpRequestOptions = {
 		method: 'POST',
 		url: tokenUrl,
 		headers: {
@@ -74,7 +74,7 @@ export async function makeAuthenticatedRequest(
 	body?: IDataObject,
 	qs?: IDataObject,
 ): Promise<any> {
-	const options: IRequestOptions = {
+	const options: IHttpRequestOptions = {
 		method,
 		url: `${credentials.baseUrl}${endpoint}`,
 		headers: {
