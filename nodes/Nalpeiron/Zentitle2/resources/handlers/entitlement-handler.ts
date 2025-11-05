@@ -1,41 +1,34 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { BaseResourceHandler } from '../../../shared/base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';
+import { makeAuthenticatedRequest } from '../../../shared/utils';
 
 export class EntitlementResourceHandler extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
 		operation: string,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		switch (operation) {
 			case 'list':
-				return this.listEntitlements(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listEntitlements(executeFunctions, itemIndex);
 			case 'get':
-				return this.getEntitlement(executeFunctions, credentials, accessToken, itemIndex);
+				return this.getEntitlement(executeFunctions, itemIndex);
 			case 'listActivations':
-				return this.listActivations(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listActivations(executeFunctions, itemIndex);
 			case 'listActivationsLog':
-				return this.listActivationsLog(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listActivationsLog(executeFunctions, itemIndex);
 			case 'listNotes':
-				return this.listNotes(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listNotes(executeFunctions, itemIndex);
 			case 'getNotes':
-				return this.getNotes(executeFunctions, credentials, accessToken, itemIndex);
+				return this.getNotes(executeFunctions, itemIndex);
 			case 'getActivations':
-				return this.getActivations(executeFunctions, credentials, accessToken, itemIndex);
+				return this.getActivations(executeFunctions, itemIndex);
 			case 'listGroups':
-				return this.listGroups(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listGroups(executeFunctions, itemIndex);
 			case 'getGroups':
-				return this.getGroups(executeFunctions, credentials, accessToken, itemIndex);
+				return this.getGroups(executeFunctions, itemIndex);
 			case 'listGroupsAuthorizedContacts':
-				return this.listGroupsAuthorizedContacts(
-					executeFunctions,
-					credentials,
-					accessToken,
-					itemIndex,
-				);
+				return this.listGroupsAuthorizedContacts(executeFunctions, itemIndex);
 			default:
 				return this.handleUnknownOperation(operation, executeFunctions.getNode());
 		}
@@ -43,8 +36,6 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 
 	private async listEntitlements(
 		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const additionalFields = this.getNodeParameter(
@@ -55,11 +46,9 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
@@ -67,8 +56,6 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 
 	private async getEntitlement(
 		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const entitlementId = this.getNodeParameter(
@@ -85,11 +72,9 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/${entitlementId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
@@ -97,8 +82,6 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 
 	private async listActivations(
 		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const entitlementId = this.getNodeParameter(
@@ -115,11 +98,9 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/${entitlementId}/activations`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
@@ -127,8 +108,6 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 
 	private async listActivationsLog(
 		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const entitlementId = this.getNodeParameter(
@@ -145,22 +124,15 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/${entitlementId}/activations-log`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
 	}
 
-	private async listNotes(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
+	private async listNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -168,21 +140,14 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as string;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/${entitlementId}/notes`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 		);
 	}
 
-	private async getNotes(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
+	private async getNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -191,19 +156,15 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		const noteId = this.getNodeParameter(executeFunctions, 'noteId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/${entitlementId}/notes/${noteId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 		);
 	}
 
 	private async getActivations(
 		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const activationId = this.getNodeParameter(
@@ -213,21 +174,14 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as string;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/activations/${activationId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 		);
 	}
 
-	private async listGroups(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
+	private async listGroups(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -236,22 +190,15 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/groups`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
 	}
 
-	private async getGroups(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
+	private async getGroups(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -266,11 +213,9 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/groups/${entitlementGroupId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
@@ -278,8 +223,6 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 
 	private async listGroupsAuthorizedContacts(
 		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		const entitlementGroupId = this.getNodeParameter(
@@ -296,11 +239,9 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/entitlements/groups/${entitlementGroupId}/authorized-contacts`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);

@@ -47,7 +47,7 @@
 	"n8n": {
 		"n8nNodesApiVersion": 1,
 		"credentials": [
-			"dist/credentials/NalpeironApi.credentials.js"
+			"dist/credentials/NalpeironOAuth2Api.credentials.js"
 		],
 		"nodes": [
 			"dist/nodes/Nalpeiron/Zentitle2/NalpeironZentitle2.node.js",

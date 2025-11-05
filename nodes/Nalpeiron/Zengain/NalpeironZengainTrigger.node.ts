@@ -33,7 +33,7 @@ export class NalpeironZengainTrigger implements INodeType {
 		],
 		credentials: [
 			{
-				name: 'nalpeiron-Api',
+				name: 'nalpeironOAuth2Api',
 				required: true,
 			},
 		],

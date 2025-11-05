@@ -21,19 +21,10 @@ export class NalpeironZengain implements INodeType {
 		usableAsTool: true,
 		credentials: [
 			{
-				name: 'nalpeiron-Api',
+				name: 'nalpeironOAuth2Api',
 				required: true,
 			},
 		],
-		requestDefaults: {
-			baseURL: '={{$credentials?.baseUrl || "https://api.nalpeiron.com"}}',
-			url: '',
-			headers: {
-				Accept: 'application/json',
-				'Content-Type': 'application/json',
-				'N-TenantId': '={{$credentials.tenantId}}',
-			},
-		},
 		properties: getAllNodeProperties(),
 	};
 

@@ -1,22 +1,13 @@
 import { IHookFunctions, NodeOperationError } from 'n8n-workflow';
-import { getOAuth2AccessToken, makeWebhookRequest, INalpeironCredentials } from './utils';
+import { makeWebhookRequest } from './utils';
 
 export const createWebhookMethods = () => ({
 	default: {
 		async checkExists(this: IHookFunctions): Promise<boolean> {
 			try {
-				const credentials = (await this.getCredentials('nalpeiron-Api')) as INalpeironCredentials;
-				const accessToken = await getOAuth2AccessToken(credentials, this.helpers, this.getNode());
-
 				const webhookUrl = this.getNodeWebhookUrl('default') as string;
 
-				const webhooks = await makeWebhookRequest(
-					'GET',
-					'/api/v1/account/webhooks',
-					accessToken,
-					credentials,
-					this.helpers,
-				);
+				const webhooks = await makeWebhookRequest(this, 'GET', '/api/v1/account/webhooks');
 
 				if (webhooks && webhooks.data) {
 					const existingWebhook = webhooks.data.find((webhook: any) => webhook.uri === webhookUrl);
@@ -37,10 +28,6 @@ export const createWebhookMethods = () => ({
 		},
 		async create(this: IHookFunctions): Promise<boolean> {
 			try {
-				const credentials = (await this.getCredentials('nalpeiron-Api')) as INalpeironCredentials;
-
-				const accessToken = await getOAuth2AccessToken(credentials, this.helpers, this.getNode());
-
 				const events = this.getNodeParameter('events') as string[];
 				const webhookUrl = this.getNodeWebhookUrl('default') as string;
 
@@ -56,14 +43,7 @@ export const createWebhookMethods = () => ({
 					subscriptions: events,
 				};
 
-				const webhook = await makeWebhookRequest(
-					'POST',
-					'/api/v1/account/webhooks',
-					accessToken,
-					credentials,
-					this.helpers,
-					body,
-				);
+				const webhook = await makeWebhookRequest(this, 'POST', '/api/v1/account/webhooks', body);
 
 				if (webhook && webhook.id) {
 					const staticData = this.getWorkflowStaticData('global');
@@ -88,16 +68,7 @@ export const createWebhookMethods = () => ({
 					return true;
 				}
 
-				const credentials = (await this.getCredentials('nalpeiron-Api')) as INalpeironCredentials;
-				const accessToken = await getOAuth2AccessToken(credentials, this.helpers, this.getNode());
-
-				await makeWebhookRequest(
-					'DELETE',
-					`/api/v1/account/webhooks/${webhookId}`,
-					accessToken,
-					credentials,
-					this.helpers,
-				);
+				await makeWebhookRequest(this, 'DELETE', `/api/v1/account/webhooks/${webhookId}`);
 
 				delete staticData.webhookId;
 
