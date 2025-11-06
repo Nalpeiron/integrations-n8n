@@ -4,8 +4,6 @@ export class {{className}} extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
 		operation: string,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		switch (operation) {

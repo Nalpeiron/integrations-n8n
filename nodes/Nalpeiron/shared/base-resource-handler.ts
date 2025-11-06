@@ -1,13 +1,10 @@
 import type { IExecuteFunctions, INode } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
-import type { INalpeironCredentials } from './utils';
 
 export abstract class BaseResourceHandler {
 	abstract executeOperation(
 		executeFunctions: IExecuteFunctions,
 		operation: string,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any>;
 

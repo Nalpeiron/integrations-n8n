@@ -63,7 +63,7 @@ export class TemplateEngine {
 
 		return `${imports}
 import { BaseResourceHandler } from '../../../shared/base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';`;
+import { makeAuthenticatedRequest } from '../../../shared/utils';`;
 	}
 
 	private generateOperationCases(resource: GeneratedResource): string {
@@ -72,7 +72,7 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../s
 		return resource.operations
 			.map((op) => {
 				const methodName = operationMethods.get(op.name) || 'handleUnknown';
-				return `\t\t\tcase '${op.name}':\n\t\t\t\treturn this.${methodName}(executeFunctions, credentials, accessToken, itemIndex);`;
+				return `\t\t\tcase '${op.name}':\n\t\t\t\treturn this.${methodName}(executeFunctions, itemIndex);`;
 			})
 			.join('\n');
 	}
@@ -100,8 +100,6 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../s
 
 		let method = `\tprivate async ${finalMethodName}(\n`;
 		method += `\t\texecuteFunctions: IExecuteFunctions,\n`;
-		method += `\t\tcredentials: INalpeironCredentials,\n`;
-		method += `\t\taccessToken: string,\n`;
 		method += `\t\titemIndex: number,\n`;
 		method += `\t): Promise<any> {\n`;
 
@@ -145,11 +143,9 @@ import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../s
 		}
 
 		method += `\t\treturn await makeAuthenticatedRequest(\n`;
+		method += `\t\t\texecuteFunctions,\n`;
 		method += `\t\t\t'${operation.method}',\n`;
 		method += `\t\t\t\`${apiPath}\`,\n`;
-		method += `\t\t\taccessToken,\n`;
-		method += `\t\t\tcredentials,\n`;
-		method += `\t\t\texecuteFunctions.helpers,\n`;
 
 		// Add body parameter for write operations
 		if (operation.method === 'POST' || operation.method === 'PUT' || operation.method === 'PATCH') {

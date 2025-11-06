@@ -34,12 +34,14 @@ Automate your license management and customer success workflows with the [Nalpei
 Listen for webhook events from both Growth Platform components:
 
 **Zentitle2 Component Events**:
+
 - License creation, activation, and expiration
-- Customer lifecycle events  
+- Customer lifecycle events
 - Seat management notifications
 - Renewal and maintenance alerts
 
 **Zengain Component Events**:
+
 - Customer lifecycle changes (creation and updates) for revenue optimization and proactive customer success
 
 ## Use Cases
@@ -47,18 +49,21 @@ Listen for webhook events from both Growth Platform components:
 Perfect for automating:
 
 **License Management (Zentitle2 Component):**
+
 - **License Monitoring**: Track license status and expiration dates across your organization
 - **Renewal Alerts**: Set up notifications for upcoming license expirations
 - **Usage Reporting**: Generate reports on license utilization and seat assignments
 - **Compliance Tracking**: Monitor license compliance and usage patterns
 
 **Customer Success & Revenue Growth (Zengain Component):**
+
 - **Revenue Optimization**: Identify upsell opportunities and at-risk accounts
 - **Proactive Customer Success**: Automate engagement based on customer lifecycle insights
 - **Sales Intelligence**: Sync customer behavior data to CRM systems for prioritized outreach
 - **Churn Prevention**: Set up automated workflows to address customer health signals
 
 **Integrated Growth Platform Workflows:**
+
 - **Data Synchronization**: Keep external systems updated with both license and customer success information from the Growth Platform
 - **Unified Customer View**: Combine Zentitle2 licensing data with Zengain customer success insights for complete customer intelligence
 
@@ -99,7 +104,7 @@ Install via Community Nodes (recommended) or npm as shown above.
    - **Tenant ID**: Your Nalpeiron tenant identifier
    - **Client ID**: Your OAuth2 Client ID from Nalpeiron admin panel
    - **Client Secret**: Your OAuth2 Client Secret from Nalpeiron admin panel
-   - **OAuth URL**: The OAuth2 endpoint URL (e.g., https://auth.nalpeiron.com/protocol/openid-connect/token)
+   - **Access Token URL**: The OAuth2 Token endpoint URL (e.g., https://auth.nalpeiron.com/protocol/openid-connect/token)
 
 ### Step 4: Test Your Credentials
 
@@ -121,10 +126,12 @@ The credentials include a built-in test function:
 After installation, you'll find four new nodes in your n8n palette:
 
 **Zentitle2 Nodes** (License Management Component):
+
 - **📊 Nalpeiron Zentitle2** - Retrieve license data (get licenses, customers, products, usage information)
 - **🔔 Nalpeiron Zentitle2 Trigger** - Listen for real-time events (license expiration, customer updates, renewals)
 
 **Zengain Nodes** (Customer Success Component):
+
 - **📊 Nalpeiron Zengain** - Access customer lifecycle data and account insights for revenue optimization
 - **🔔 Nalpeiron Zengain Trigger** - Listen for customer success events to drive proactive engagement
 
@@ -133,11 +140,13 @@ After installation, you'll find four new nodes in your n8n palette:
 ### Example Workflows
 
 **License Renewal Alert (Zentitle2 Component):**
+
 ```
 Nalpeiron Zentitle2 Trigger (license expires in 7 days) → Get Customer Details → Send Renewal Notice
 ```
 
 **Customer Success Automation (Zengain Component):**
+
 ```
 Nalpeiron Zengain Trigger (customer created) → Get Customer Insights → Update CRM with Revenue Opportunities
 ```
@@ -212,7 +221,6 @@ All webhooks follow this structure:
 
 1. Verify OAuth2 credentials are correct and have proper permissions
 2. Check the base URL points to the correct environment
-
 
 ## License
 

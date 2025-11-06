@@ -1,31 +1,24 @@
 import type { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { BaseResourceHandler } from '../../../shared/base-resource-handler';
-import { makeAuthenticatedRequest, type INalpeironCredentials } from '../../../shared/utils';
+import { makeAuthenticatedRequest } from '../../../shared/utils';
 
 export class PlanResourceHandler extends BaseResourceHandler {
 	async executeOperation(
 		executeFunctions: IExecuteFunctions,
 		operation: string,
-		credentials: INalpeironCredentials,
-		accessToken: string,
 		itemIndex: number,
 	): Promise<any> {
 		switch (operation) {
 			case 'list':
-				return this.listPlans(executeFunctions, credentials, accessToken, itemIndex);
+				return this.listPlans(executeFunctions, itemIndex);
 			case 'get':
-				return this.getPlan(executeFunctions, credentials, accessToken, itemIndex);
+				return this.getPlan(executeFunctions, itemIndex);
 			default:
 				return this.handleUnknownOperation(operation, executeFunctions.getNode());
 		}
 	}
 
-	private async listPlans(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
+	private async listPlans(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -34,30 +27,21 @@ export class PlanResourceHandler extends BaseResourceHandler {
 		) as IDataObject;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/plans`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 			additionalFields,
 		);
 	}
 
-	private async getPlan(
-		executeFunctions: IExecuteFunctions,
-		credentials: INalpeironCredentials,
-		accessToken: string,
-		itemIndex: number,
-	): Promise<any> {
+	private async getPlan(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
 		const planId = this.getNodeParameter(executeFunctions, 'planId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
+			executeFunctions,
 			'GET',
 			`/api/v1/plans/${planId}`,
-			accessToken,
-			credentials,
-			executeFunctions.helpers,
 			undefined,
 		);
 	}
