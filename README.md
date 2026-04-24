@@ -2,6 +2,8 @@
 
 Automate your license management and customer success workflows with the [Nalpeiron Growth Platform](https://nalpeiron.com). This n8n community node lets you integrate both Zentitle2 (license operations) and Zengain (customer lifecycle management) components with real-time notifications into your automation workflows.
 
+In addition to retrieval operations, action nodes support creating and updating records (POST/PATCH) for supported resources.
+
 ![Version](https://img.shields.io/npm/v/@nalpeiron/n8n-nodes-nalpeiron)
 ![Downloads](https://img.shields.io/npm/dm/@nalpeiron/n8n-nodes-nalpeiron)
 ![License](https://img.shields.io/npm/l/@nalpeiron/n8n-nodes-nalpeiron)

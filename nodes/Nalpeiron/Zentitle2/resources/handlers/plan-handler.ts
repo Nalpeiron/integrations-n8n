@@ -9,6 +9,8 @@ export class PlanResourceHandler extends BaseResourceHandler {
 		itemIndex: number,
 	): Promise<any> {
 		switch (operation) {
+			case 'create':
+				return this.createPlan(executeFunctions, itemIndex);
 			case 'list':
 				return this.listPlans(executeFunctions, itemIndex);
 			case 'get':
@@ -16,6 +18,69 @@ export class PlanResourceHandler extends BaseResourceHandler {
 			default:
 				return this.handleUnknownOperation(operation, executeFunctions.getNode());
 		}
+	}
+
+	private async createPlan(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+		const useRawJson = this.getNodeParameter(
+			executeFunctions,
+			'useRawJson',
+			itemIndex,
+			false,
+		) as boolean;
+
+		const nodeParameters = executeFunctions.getNode().parameters as IDataObject;
+		const hasPersistedRequestBody = Object.prototype.hasOwnProperty.call(
+			nodeParameters,
+			'requestBody',
+		);
+
+		let finalRequestBody: IDataObject = {};
+		if (useRawJson || hasPersistedRequestBody) {
+			finalRequestBody = this.getNodeParameter(
+				executeFunctions,
+				'requestBody',
+				itemIndex,
+				{},
+			) as IDataObject;
+		} else {
+			const bodyFromFields: IDataObject = {};
+
+			const requiredBody_nameValue = this.getNodeParameter(
+				executeFunctions,
+				'requiredBody_name',
+				itemIndex,
+			) as string;
+			bodyFromFields['name'] = requiredBody_nameValue;
+			const requiredBody_licenseTypeValue = this.getNodeParameter(
+				executeFunctions,
+				'requiredBody_licenseType',
+				itemIndex,
+			) as string;
+			bodyFromFields['licenseType'] = requiredBody_licenseTypeValue;
+			const requiredBody_licenseStartTypeValue = this.getNodeParameter(
+				executeFunctions,
+				'requiredBody_licenseStartType',
+				itemIndex,
+			) as string;
+			bodyFromFields['licenseStartType'] = requiredBody_licenseStartTypeValue;
+
+			const requestBodyAdditionalFields = this.getNodeParameter(
+				executeFunctions,
+				'additionalFields',
+				itemIndex,
+				{},
+			) as IDataObject;
+			Object.assign(bodyFromFields, requestBodyAdditionalFields);
+
+			finalRequestBody = bodyFromFields;
+		}
+
+		return await makeAuthenticatedRequest(
+			executeFunctions,
+			'POST',
+			`/api/v1/plans`,
+			finalRequestBody,
+		);
 	}
 
 	private async listPlans(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {

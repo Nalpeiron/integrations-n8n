@@ -1,22 +1,49 @@
 {
-	"lastUpdated": "2025-11-04T11:19:33.301Z",
+	"lastUpdated": "2026-04-23T16:08:27.547Z",
 	"apiSource": {
 		"url": "https://api.nalpeiron.io/openapi/v1/2025-10-10/openapi.json",
-		"version": "2025-10-10:v1.0.1643"
+		"version": "2025-10-10:v1.0.1969"
 	},
 	"components": {
 		"NalpeironZentitle2": {
 			"generatedBy": "openapi-generator",
 			"resourceCount": 7,
+			"n8n": {
+				"nodesApiVersion": 1,
+				"workflowVersion": "2.13.1"
+			},
 			"config": {
-				"methods": ["GET"],
+				"methods": ["GET", "POST", "PATCH"],
 				"excludedResources": ["tenant", "abl", "account", "locallicenseserver"],
 				"excludedOperations": {
-					"entitlement": ["EntitlementGroup_GetLicenseFile"]
+					"entitlement": [
+						"EntitlementGroup_GetLicenseFile",
+						"EntitlementGroup_SetLicenseFile",
+						"Entitlements_Export",
+						"Entitlements_GenerateExportToken",
+						"Entitlements_Import",
+						"OfflineActivations_Activate",
+						"OfflineActivations_Refresh",
+						"OfflineActivations_DeactivateOfflineActivation"
+					]
 				},
 				"includedTags": ["Zentitle"]
 			},
-			"generatedAt": "2025-11-04T11:19:27.280Z"
+			"generatedAt": "2026-04-23T16:08:21.819Z"
+		},
+		"NalpeironZengain": {
+			"generatedBy": "openapi-generator",
+			"resourceCount": 1,
+			"n8n": {
+				"nodesApiVersion": 1,
+				"workflowVersion": "2.13.1"
+			},
+			"config": {
+				"methods": ["GET", "POST", "PATCH"],
+				"excludedResources": ["account", "insight", "product", "subscription"],
+				"includedTags": ["Zengain"]
+			},
+			"generatedAt": "2026-04-23T16:08:24.036Z"
 		},
 		"NalpeironZentitle2Trigger": {
 			"generatedBy": "webhook-generator",
@@ -24,17 +51,7 @@
 			"config": {
 				"includedTags": ["Zentitle"]
 			},
-			"generatedAt": "2025-11-04T11:19:31.932Z"
-		},
-		"NalpeironZengain": {
-			"generatedBy": "openapi-generator",
-			"resourceCount": 1,
-			"config": {
-				"methods": ["GET"],
-				"excludedResources": ["account", "insight", "product", "subscription"],
-				"includedTags": ["Zengain"]
-			},
-			"generatedAt": "2025-11-04T11:19:29.515Z"
+			"generatedAt": "2026-04-23T16:08:25.577Z"
 		},
 		"NalpeironZengainTrigger": {
 			"generatedBy": "webhook-generator",
@@ -42,7 +59,7 @@
 			"config": {
 				"includedTags": ["Zengain"]
 			},
-			"generatedAt": "2025-11-04T11:19:33.302Z"
+			"generatedAt": "2026-04-23T16:08:27.547Z"
 		}
 	}
 }

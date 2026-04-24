@@ -93,9 +93,11 @@ export interface ResourceOperation {
 	displayName: string; // Human readable name (e.g., 'Get Customer')
 	description: string; // Operation description
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+	hasRequestBody: boolean; // True when OpenAPI operation defines requestBody
 	path: string; // API path pattern (e.g., '/api/v1/customers/{id}')
 	operationId?: string; // OpenAPI operationId
 	parameters: OperationParameter[];
+	requestBodyParameters?: OperationParameter[]; // Top-level request body fields extracted from OpenAPI schema
 	requestBodySchema?: string | null; // Reference to request body schema
 	responseSchema?: string | null; // Reference to response schema
 	isListOperation: boolean; // True if this is a list/collection operation
@@ -111,6 +113,7 @@ export interface OperationParameter {
 	description: string; // Parameter description
 	location: 'path' | 'query' | 'header' | 'body'; // Where the parameter is sent
 	schema?: any; // OpenAPI schema for the parameter
+	mapValueSchema?: any; // Schema of values for key/value map fields (object additionalProperties)
 	enum?: string[]; // Enumeration values if applicable
 	default?: any; // Default value
 }

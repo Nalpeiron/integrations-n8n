@@ -8,7 +8,7 @@ import { offeringProperties } from './properties/offering-properties';
 import { planProperties } from './properties/plan-properties';
 import { productProperties } from './properties/product-properties';
 
-// Import only the generated property modules (filtered for GET only, excluding Zengain)
+// Import only the generated property modules
 
 export interface IPropertyRegistry {
 	getResourceSelectionProperty(): INodeProperties;
