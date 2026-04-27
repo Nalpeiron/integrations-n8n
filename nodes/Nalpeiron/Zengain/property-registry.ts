@@ -2,7 +2,7 @@ import type { INodeProperties } from 'n8n-workflow';
 import { getResourceOptions } from './resource-config';
 import { customerProperties } from './properties/customer-properties';
 
-// Import only the generated property modules (filtered for GET only, excluding Zengain)
+// Import only the generated property modules
 
 export interface IPropertyRegistry {
 	getResourceSelectionProperty(): INodeProperties;

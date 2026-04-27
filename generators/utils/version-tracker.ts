@@ -21,6 +21,11 @@ export interface ComponentInfo {
 	generatedBy: string;
 	resourceCount?: number;
 	webhookEventCount?: number;
+	n8n?: {
+		nodesApiVersion?: number;
+		workflowVersion?: string;
+		instanceVersion?: string;
+	};
 	config?: {
 		methods?: string[];
 		excludedResources?: string[];

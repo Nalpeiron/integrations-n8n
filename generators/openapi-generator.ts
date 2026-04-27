@@ -5,7 +5,7 @@ import * as path from 'path';
 import { OpenAPIParser } from './utils/openapi-parser';
 import { TemplateEngine } from './utils/template-engine';
 import { OpenAPIDownloader } from './utils/openapi-downloader';
-import { VersionTracker } from './utils/version-tracker';
+import { VersionTracker, type ComponentInfo } from './utils/version-tracker';
 import type { GeneratedResource, GenerationConfig } from './types/generator-types';
 import { DEFAULT_OPENAPI_URL, PRODUCT_CONFIGS } from './config/product-config';
 
@@ -19,6 +19,7 @@ class OpenAPIGenerator {
 	constructor(
 		private outputDir: string,
 		private openApiUrl?: string,
+		private n8nInstanceVersion?: string,
 	) {
 		this.parser = new OpenAPIParser();
 		this.templateEngine = new TemplateEngine();
@@ -70,10 +71,12 @@ class OpenAPIGenerator {
 			const componentName = this.outputDir.includes('Zengain')
 				? 'NalpeironZengain'
 				: 'NalpeironZentitle2';
+			const n8nVersionInfo = await this.getN8nVersionInfo();
 
 			await this.versionTracker.updateComponentVersion(componentName, apiUrl, version, {
 				generatedBy: 'openapi-generator',
 				resourceCount: resources.length,
+				n8n: n8nVersionInfo,
 				config: {
 					methods: this.config.allowedMethods,
 					excludedResources: this.config.excludedResources,
@@ -194,7 +197,7 @@ class OpenAPIGenerator {
 import { getResourceOptions } from './resource-config';
 ${imports}
 
-// Import only the generated property modules (filtered for GET only, excluding Zengain)
+// Import only the generated property modules
 
 export interface IPropertyRegistry {
 	getResourceSelectionProperty(): INodeProperties;
@@ -372,6 +375,51 @@ export function getResourceConfig(resourceValue: string): IResourceConfig | unde
 		console.log('  ✓ Regenerated resource-config.ts');
 	}
 
+	private async getN8nVersionInfo(): Promise<ComponentInfo['n8n'] | undefined> {
+		let nodesApiVersion: number | undefined;
+		let workflowVersion: string | undefined;
+
+		try {
+			const packageJsonPath = path.join(__dirname, '..', 'package.json');
+			const packageJsonContent = await fs.readFile(packageJsonPath, 'utf-8');
+			const packageJson = JSON.parse(packageJsonContent) as {
+				n8n?: { n8nNodesApiVersion?: number };
+			};
+
+			if (typeof packageJson.n8n?.n8nNodesApiVersion === 'number') {
+				nodesApiVersion = packageJson.n8n.n8nNodesApiVersion;
+			}
+		} catch {
+			// Ignore and continue without n8nNodesApiVersion metadata
+		}
+
+		try {
+			const workflowPackagePath = path.join(
+				__dirname,
+				'..',
+				'node_modules',
+				'n8n-workflow',
+				'package.json',
+			);
+			const workflowPackageContent = await fs.readFile(workflowPackagePath, 'utf-8');
+			const workflowPackage = JSON.parse(workflowPackageContent) as { version?: string };
+			workflowVersion = workflowPackage.version;
+		} catch {
+			// Ignore and continue without n8n-workflow metadata
+		}
+
+		const instanceVersion = this.n8nInstanceVersion?.trim() || undefined;
+		if (!nodesApiVersion && !workflowVersion && !instanceVersion) {
+			return undefined;
+		}
+
+		return {
+			nodesApiVersion,
+			workflowVersion,
+			instanceVersion,
+		};
+	}
+
 	private async ensureDirectoryExists(dirPath: string): Promise<void> {
 		try {
 			await fs.access(dirPath);
@@ -456,6 +504,24 @@ async function main() {
 			? args[excludeResourcesIndex + 1].split(',')
 			: undefined;
 
+	const methodsIndex = args.indexOf('--methods');
+	const methodsArg =
+		methodsIndex !== -1 && args[methodsIndex + 1] ? args[methodsIndex + 1] : undefined;
+	const methodsFromCli = methodsArg
+		? Array.from(
+				new Set(
+					methodsArg
+						.split(',')
+						.map((method) => method.trim().toUpperCase())
+						.filter(Boolean),
+				),
+			)
+		: undefined;
+
+	const n8nVersionIndex = args.indexOf('--n8n-version');
+	const n8nInstanceVersion =
+		n8nVersionIndex !== -1 && args[n8nVersionIndex + 1] ? args[n8nVersionIndex + 1] : undefined;
+
 	const getOnly = args.includes('--get-only');
 	const disableDefaults = args.includes('--no-defaults');
 
@@ -463,6 +529,7 @@ async function main() {
 	let finalTags = includeTags;
 	let outputDir: string;
 	let excludedOperations: { [resourceName: string]: string[] } | undefined;
+	let allowedMethods: string[] | undefined;
 
 	if (productName && PRODUCT_CONFIGS[productName]) {
 		const productConfig = PRODUCT_CONFIGS[productName];
@@ -482,19 +549,37 @@ async function main() {
 
 		// Pass excluded operations from product config
 		excludedOperations = productConfig.excludedOperations;
+		if (!disableDefaults && productConfig.allowedMethods?.length) {
+			allowedMethods = productConfig.allowedMethods.map((method) => method.toUpperCase());
+		}
 
 		console.log(`🎯 Using product configuration: ${productConfig.displayName}`);
 	} else {
 		outputDir = customOutput || path.join(__dirname, '..', 'nodes', 'Nalpeiron', 'Zentitle2');
 	}
 
-	const generator = new OpenAPIGenerator(outputDir, openApiPath);
+	const generator = new OpenAPIGenerator(outputDir, openApiPath, n8nInstanceVersion);
 
-	// Configure filtering based on CLI flags and defaults
-	const shouldApplyGetOnly = getOnly || (!disableDefaults && productName);
-	if (shouldApplyGetOnly) {
-		generator.setAllowedMethods(['GET']);
-		console.log('🔍 Filtering to GET methods only');
+	// Configure filtering based on defaults and CLI flags
+	if (getOnly) {
+		allowedMethods = ['GET'];
+	}
+
+	if (methodsFromCli && methodsFromCli.length > 0) {
+		const supportedMethods = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
+		const invalidMethods = methodsFromCli.filter((method) => !supportedMethods.has(method));
+		if (invalidMethods.length > 0) {
+			throw new Error(
+				`Unsupported methods in --methods: ${invalidMethods.join(', ')}. Supported methods: GET, POST, PUT, PATCH, DELETE`,
+			);
+		}
+
+		allowedMethods = methodsFromCli;
+	}
+
+	if (allowedMethods && allowedMethods.length > 0) {
+		generator.setAllowedMethods(allowedMethods);
+		console.log(`🔧 Allowed methods: ${allowedMethods.join(', ')}`);
 	}
 
 	if (finalTags && finalTags.length > 0) {

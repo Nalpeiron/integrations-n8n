@@ -14,6 +14,13 @@ export const attributeProperties: INodeProperties[] = [
 		},
 		options: [
 			{
+				name: 'Create Global Attribute',
+				value: 'create',
+				description:
+					'Create a global attribute that will be included in all entitlements. Default value can be overridden in product or edition level.',
+				action: 'Create global attribute',
+			},
+			{
 				name: 'Get Global Attribute',
 				value: 'get',
 				description: 'This method returns selected global attribute',
@@ -26,7 +33,7 @@ export const attributeProperties: INodeProperties[] = [
 				action: 'Get global attributes list',
 			},
 		],
-		default: 'list',
+		default: 'create',
 	},
 	// Attribute ID parameter
 	{
@@ -78,5 +85,111 @@ export const attributeProperties: INodeProperties[] = [
 				description: 'Maximum number of items per page',
 			},
 		],
+	},
+	// Required field: Key
+	{
+		displayName: 'Key',
+		name: 'requiredBody_key',
+		type: 'string',
+		required: true,
+		default: '',
+		displayOptions: {
+			show: {
+				resource: ['attribute'],
+				operation: ['create'],
+				useRawJson: [false],
+			},
+		},
+		description: 'Attribute unique key',
+	},
+	// Required field: Type
+	{
+		displayName: 'Type',
+		name: 'requiredBody_type',
+		type: 'options',
+		required: true,
+		default: 'number',
+		displayOptions: {
+			show: {
+				resource: ['attribute'],
+				operation: ['create'],
+				useRawJson: [false],
+			},
+		},
+		options: [
+			{
+				name: 'Date',
+				value: 'date',
+			},
+			{
+				name: 'Number',
+				value: 'number',
+			},
+			{
+				name: 'String',
+				value: 'string',
+			},
+		],
+	},
+	// Optional request body fields for Create global attribute
+	{
+		displayName: 'Additional Fields',
+		name: 'additionalFields',
+		type: 'collection',
+		placeholder: 'Add Field',
+		default: {},
+		displayOptions: {
+			show: {
+				resource: ['attribute'],
+				operation: ['create'],
+				useRawJson: [false],
+			},
+		},
+		options: [
+			{
+				displayName: 'Validation Rules',
+				name: 'validationRules',
+				type: 'json',
+				default: '{}',
+				description: 'Optional validation rules for the attribute value',
+			},
+			{
+				displayName: 'Value',
+				name: 'value',
+				type: 'string',
+				default: '',
+				description: 'Attribute value',
+			},
+		],
+		description: 'Optional request body fields',
+	},
+	// Raw JSON toggle for create/update operations
+	{
+		displayName: 'Raw JSON',
+		name: 'useRawJson',
+		type: 'boolean',
+		default: false,
+		displayOptions: {
+			show: {
+				resource: ['attribute'],
+				operation: ['create'],
+			},
+		},
+		description: 'Whether to enter the request body as raw JSON',
+	},
+	// Raw request body JSON for create/update operations
+	{
+		displayName: 'Request Body',
+		name: 'requestBody',
+		type: 'json',
+		default: '{}',
+		displayOptions: {
+			show: {
+				resource: ['attribute'],
+				operation: ['create'],
+				useRawJson: [true],
+			},
+		},
+		description: 'Request body data as JSON object',
 	},
 ];

@@ -52,9 +52,7 @@ export class TemplateEngine {
 			(op) =>
 				op.parameters.some((p) => p.location === 'query') ||
 				op.isListOperation ||
-				op.method === 'POST' ||
-				op.method === 'PUT' ||
-				op.method === 'PATCH',
+				op.hasRequestBody,
 		);
 
 		const imports = needsIDataObject
@@ -121,14 +119,105 @@ import { makeAuthenticatedRequest } from '../../../shared/utils';`;
 			method += `\t\t) as IDataObject;\n\n`;
 		}
 
-		// Handle request body for POST/PUT operations
-		if (operation.method === 'POST' || operation.method === 'PUT' || operation.method === 'PATCH') {
-			method += `\t\tconst body = this.getNodeParameter(\n`;
-			method += `\t\t\texecuteFunctions,\n`;
-			method += `\t\t\t'additionalFields',\n`;
-			method += `\t\t\titemIndex,\n`;
-			method += `\t\t\t{},\n`;
-			method += `\t\t) as IDataObject;\n\n`;
+		// Handle request body for write operations
+		if (operation.hasRequestBody) {
+			if ((operation.requestBodyParameters || []).length > 0) {
+				const requiredBodyParameters = (operation.requestBodyParameters || []).filter(
+					(parameter) => parameter.required,
+				);
+				const optionalBodyParameters = (operation.requestBodyParameters || []).filter(
+					(parameter) => !parameter.required,
+				);
+				const optionalFixedCollectionParameters = optionalBodyParameters.filter(
+					(parameter) => parameter.type === 'fixedCollection',
+				);
+				const optionalArrayParameters = optionalBodyParameters.filter((parameter) =>
+					this.shouldConvertParameterToArray(parameter),
+				);
+
+				method += `\t\tconst useRawJson = this.getNodeParameter(\n`;
+				method += `\t\t\texecuteFunctions,\n`;
+				method += `\t\t\t'useRawJson',\n`;
+				method += `\t\t\titemIndex,\n`;
+				method += `\t\t\tfalse,\n`;
+				method += `\t\t) as boolean;\n\n`;
+				method += `\t\tconst nodeParameters = executeFunctions.getNode().parameters as IDataObject;\n`;
+				method += `\t\tconst hasPersistedRequestBody = Object.prototype.hasOwnProperty.call(\n`;
+				method += `\t\t\tnodeParameters,\n`;
+				method += `\t\t\t'requestBody',\n`;
+				method += `\t\t);\n\n`;
+				method += `\t\tlet finalRequestBody: IDataObject = {};\n`;
+				method += `\t\tif (useRawJson || hasPersistedRequestBody) {\n`;
+				method += `\t\t\tfinalRequestBody = this.getNodeParameter(\n`;
+				method += `\t\t\t\texecuteFunctions,\n`;
+				method += `\t\t\t\t'requestBody',\n`;
+				method += `\t\t\t\titemIndex,\n`;
+				method += `\t\t\t\t{},\n`;
+				method += `\t\t\t) as IDataObject;\n`;
+				method += `\t\t} else {\n`;
+				method += `\t\t\tconst bodyFromFields: IDataObject = {};\n`;
+
+				if (requiredBodyParameters.length > 0) {
+					method += '\n';
+					for (const parameter of requiredBodyParameters) {
+						const requiredPropertyName = this.getRequiredBodyPropertyName(
+							resource.name,
+							operation.name,
+							parameter.name,
+						);
+						const valueVariableName = `${requiredPropertyName}Value`;
+						method += `\t\t\tconst ${valueVariableName} = this.getNodeParameter(\n`;
+						method += `\t\t\t\texecuteFunctions,\n`;
+						method += `\t\t\t\t'${requiredPropertyName}',\n`;
+						method += `\t\t\t\titemIndex,\n`;
+						method += `\t\t\t) as ${this.getNodeParameterCastType(parameter)};\n`;
+						if (parameter.type === 'fixedCollection') {
+							method += `\t\t\tbodyFromFields['${parameter.name}'] = this.convertFixedCollectionToObject(${valueVariableName});\n`;
+						} else if (parameter.type === 'collection') {
+							const schemaLiteral = this.serializeSchemaForCode(parameter.schema);
+							method += `\t\t\tbodyFromFields['${parameter.name}'] = this.applySchemaDefaultsToObject(${valueVariableName}, ${schemaLiteral} as IDataObject);\n`;
+						} else if (this.shouldConvertParameterToArray(parameter)) {
+							method += `\t\t\tbodyFromFields['${parameter.name}'] = this.convertFixedCollectionToArray(${valueVariableName});\n`;
+						} else {
+							method += `\t\t\tbodyFromFields['${parameter.name}'] = ${valueVariableName};\n`;
+						}
+					}
+				}
+
+				if (optionalBodyParameters.length > 0) {
+					method += `\n\t\t\tconst requestBodyAdditionalFields = this.getNodeParameter(\n`;
+					method += `\t\t\t\texecuteFunctions,\n`;
+					method += `\t\t\t\t'additionalFields',\n`;
+					method += `\t\t\t\titemIndex,\n`;
+					method += `\t\t\t\t{},\n`;
+					method += `\t\t\t) as IDataObject;\n`;
+					method += `\t\t\tObject.assign(bodyFromFields, requestBodyAdditionalFields);\n`;
+					for (const parameter of optionalFixedCollectionParameters) {
+						method += `\t\t\tif (requestBodyAdditionalFields['${parameter.name}']) {\n`;
+						method += `\t\t\t\tbodyFromFields['${parameter.name}'] = this.convertFixedCollectionToObject(\n`;
+						method += `\t\t\t\t\trequestBodyAdditionalFields['${parameter.name}'] as IDataObject,\n`;
+						method += `\t\t\t\t);\n`;
+						method += `\t\t\t}\n`;
+					}
+					for (const parameter of optionalArrayParameters) {
+						method += `\t\t\tif (requestBodyAdditionalFields['${parameter.name}']) {\n`;
+						method += `\t\t\t\tbodyFromFields['${parameter.name}'] = this.convertFixedCollectionToArray(\n`;
+						method += `\t\t\t\t\trequestBodyAdditionalFields['${parameter.name}'] as IDataObject,\n`;
+						method += `\t\t\t\t);\n`;
+						method += `\t\t\t}\n`;
+					}
+				}
+
+				method += `\n\t\t\tfinalRequestBody = bodyFromFields;\n`;
+				method += `\t\t}\n\n`;
+			} else {
+				method += `\t\tconst finalRequestBody = this.getNodeParameter(\n`;
+				method += `\t\t\texecuteFunctions,\n`;
+				method += `\t\t\t'requestBody',\n`;
+				method += `\t\t\titemIndex,\n`;
+				method += `\t\t\t{},\n`;
+				method += `\t\t) as IDataObject;\n\n`;
+			}
 		}
 
 		// Build the API path
@@ -148,8 +237,8 @@ import { makeAuthenticatedRequest } from '../../../shared/utils';`;
 		method += `\t\t\t\`${apiPath}\`,\n`;
 
 		// Add body parameter for write operations
-		if (operation.method === 'POST' || operation.method === 'PUT' || operation.method === 'PATCH') {
-			method += `\t\t\tbody,\n`;
+		if (operation.hasRequestBody) {
+			method += `\t\t\tfinalRequestBody,\n`;
 		} else {
 			method += `\t\t\tundefined,\n`;
 		}
@@ -217,9 +306,7 @@ import { makeAuthenticatedRequest } from '../../../shared/utils';`;
 		}
 
 		// Add additionalFields for create/update operations
-		const writeOperations = resource.operations.filter(
-			(op) => op.method === 'POST' || op.method === 'PUT' || op.method === 'PATCH',
-		);
+		const writeOperations = resource.operations.filter((op) => op.hasRequestBody);
 		if (writeOperations.length > 0) {
 			fields.push(this.generateWriteOperationFields(resource, writeOperations));
 		}
@@ -355,9 +442,234 @@ ${options}
 		resource: GeneratedResource,
 		writeOperations: ResourceOperation[],
 	): string {
-		const operationNames = writeOperations.map((op) => `'${op.name}'`).join(', ');
+		const operationsWithBasicFields = writeOperations.filter(
+			(operation) => (operation.requestBodyParameters || []).length > 0,
+		);
+		const operationsWithoutBasicFields = writeOperations.filter(
+			(operation) => (operation.requestBodyParameters || []).length === 0,
+		);
 
-		return `\t// Additional fields for create/update operations
+		const sections: string[] = [];
+
+		if (operationsWithBasicFields.length > 0) {
+			sections.push(this.generateRequiredRequestBodyFields(resource, operationsWithBasicFields));
+			sections.push(
+				...this.generateOptionalRequestBodyFieldsCollections(resource, operationsWithBasicFields),
+			);
+			sections.push(this.generateBodyModeField(resource, operationsWithBasicFields));
+			sections.push(this.generateRawRequestBodyField(resource, operationsWithBasicFields, true));
+		}
+
+		if (operationsWithoutBasicFields.length > 0) {
+			sections.push(
+				this.generateRawRequestBodyField(resource, operationsWithoutBasicFields, false),
+			);
+		}
+
+		return sections.join('\n');
+	}
+
+	private generateBodyModeField(
+		resource: GeneratedResource,
+		operations: ResourceOperation[],
+	): string {
+		const operationNames = operations.map((op) => `'${op.name}'`).join(', ');
+
+		return `\t// Raw JSON toggle for create/update operations
+\t{
+\t\tdisplayName: 'Raw JSON',
+\t\tname: 'useRawJson',
+\t\ttype: 'boolean',
+\t\tdefault: false,
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],
+\t\t\t},
+\t\t},
+\t\tdescription: 'Whether to enter the request body as raw JSON',
+\t},`;
+	}
+
+	private generateRequiredRequestBodyFields(
+		resource: GeneratedResource,
+		operations: ResourceOperation[],
+	): string {
+		const fields: string[] = [];
+
+		for (const operation of operations) {
+			const requiredParameters = (operation.requestBodyParameters || [])
+				.filter((parameter) => parameter.required)
+				.sort((a, b) => this.compareRequestBodyParameters(a, b));
+
+			for (const parameter of requiredParameters) {
+				fields.push(this.generateRequiredRequestBodyField(resource, operation.name, parameter));
+			}
+		}
+
+		return fields.join('\n');
+	}
+
+	private generateRequiredRequestBodyField(
+		resource: GeneratedResource,
+		operationName: string,
+		parameter: OperationParameter,
+	): string {
+		const description = this.formatDescription(parameter.description, parameter.type);
+		const defaultValue = this.getParameterDefaultValue(parameter);
+		const operationNames = `'${operationName}'`;
+		const parameterName = this.getRequiredBodyPropertyName(
+			resource.name,
+			operationName,
+			parameter.name,
+		);
+
+		if (this.shouldConvertParameterToArray(parameter)) {
+			return this.generateRequiredArrayRequestBodyField(
+				resource,
+				parameter,
+				parameterName,
+				operationNames,
+				description,
+			);
+		}
+
+		if (parameter.type === 'options' && parameter.enum && parameter.enum.length > 0) {
+			const sortedEnumValues = [...parameter.enum].sort((a, b) =>
+				a.localeCompare(b, undefined, { sensitivity: 'base' }),
+			);
+			const enumOptions = sortedEnumValues
+				.map((value) => {
+					const displayValue = this.nameConverter.toDisplayName(value);
+					return `\t\t\t{\n\t\t\t\tname: '${displayValue}',\n\t\t\t\tvalue: '${value}',\n\t\t\t},`;
+				})
+				.join('\n');
+
+			return `\t// Required field: ${parameter.displayName}
+\t{
+\t\tdisplayName: '${parameter.displayName}',
+\t\tname: '${parameterName}',
+\t\ttype: 'options',
+\t\trequired: true,
+\t\tdefault: ${defaultValue},
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],
+\t\t\t\tuseRawJson: [false],
+\t\t\t},
+\t\t},
+\t\toptions: [
+${enumOptions}
+\t\t],
+\t\tdescription: '${this.sanitizeDescription(description)}',
+\t},`;
+		}
+
+		if (parameter.type === 'fixedCollection') {
+			const fixedCollectionOptions = this.generateFixedCollectionEntryValues(
+				parameter.mapValueSchema,
+				'\t\t\t',
+			);
+
+			return `\t// Required field: ${parameter.displayName}
+\t{
+\t\tdisplayName: '${parameter.displayName}',
+\t\tname: '${parameterName}',
+\t\ttype: 'fixedCollection',
+\t\trequired: true,
+\t\tdefault: {},
+\t\ttypeOptions: {
+\t\t\tmultipleValues: true,
+\t\t},
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],
+\t\t\t\tuseRawJson: [false],
+\t\t\t},
+\t\t},
+\t\toptions: [
+\t\t\t{
+\t\t\t\tdisplayName: 'Field',
+\t\t\t\tname: 'entries',
+\t\t\t\tvalues: [
+${fixedCollectionOptions}
+\t\t\t\t],
+\t\t\t},
+\t\t],
+\t\tdescription: '${this.sanitizeDescription(description)}',
+\t},`;
+		}
+
+		if (parameter.type === 'collection' && parameter.schema?.properties) {
+			const collectionOptions = this.generateCollectionFieldOptions(
+				parameter.schema,
+				'\t\t\t',
+				true,
+			);
+			const collectionDefaultValue = this.getRequiredCollectionDefaultValue(parameter.schema);
+
+			return `\t// Required field: ${parameter.displayName}
+\t{
+\t\tdisplayName: '${parameter.displayName}',
+\t\tname: '${parameterName}',
+\t\ttype: 'collection',
+\t\trequired: true,
+\t\tdefault: ${collectionDefaultValue},
+\t\tplaceholder: 'Add Field',
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],
+\t\t\t\tuseRawJson: [false],
+\t\t\t},
+\t\t},
+\t\toptions: [
+${collectionOptions}
+\t\t],
+\t\tdescription: '${this.sanitizeDescription(description)}',
+\t},`;
+		}
+
+		return `\t// Required field: ${parameter.displayName}
+\t{
+\t\tdisplayName: '${parameter.displayName}',
+\t\tname: '${parameterName}',
+\t\ttype: '${parameter.type}',
+\t\trequired: true,
+\t\tdefault: ${defaultValue},
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],
+\t\t\t\tuseRawJson: [false],
+\t\t\t},
+\t\t},
+\t\tdescription: '${this.sanitizeDescription(description)}',
+\t},`;
+	}
+
+	private generateOptionalRequestBodyFieldsCollections(
+		resource: GeneratedResource,
+		operations: ResourceOperation[],
+	): string[] {
+		const collections: string[] = [];
+
+		for (const operation of operations) {
+			const optionalParameters = (operation.requestBodyParameters || [])
+				.filter((parameter) => !parameter.required)
+				.sort((a, b) => this.compareRequestBodyParameters(a, b));
+
+			if (optionalParameters.length === 0) {
+				continue;
+			}
+
+			const options = optionalParameters
+				.map((parameter) => this.generateRequestBodyFieldOption(parameter))
+				.join('\n');
+
+			collections.push(`\t// Optional request body fields for ${operation.displayName}
 \t{
 \t\tdisplayName: 'Additional Fields',
 \t\tname: 'additionalFields',
@@ -367,18 +679,161 @@ ${options}
 \t\tdisplayOptions: {
 \t\t\tshow: {
 \t\t\t\tresource: ['${resource.name}'],
-\t\t\t\toperation: [${operationNames}],
+\t\t\t\toperation: ['${operation.name}'],
+\t\t\t\tuseRawJson: [false],
 \t\t\t},
 \t\t},
 \t\toptions: [
-\t\t\t{
-\t\t\t\tdisplayName: 'Data',
-\t\t\t\tname: 'data',
-\t\t\t\ttype: 'json',
-\t\t\t\tdefault: '{}',
-\t\t\t\tdescription: 'Request body data as JSON',
-\t\t\t},
+${options}
 \t\t],
+\t\tdescription: 'Optional request body fields',
+\t},`);
+		}
+
+		return collections;
+	}
+
+	private generateRequestBodyFieldOption(parameter: OperationParameter): string {
+		const description = this.formatDescription(parameter.description, parameter.type);
+		const defaultValue = this.getParameterDefaultValue(parameter);
+		const sanitizedDisplayName = this.sanitizeDescription(parameter.displayName);
+
+		if (this.shouldConvertParameterToArray(parameter)) {
+			return this.generateArrayRequestBodyFieldOption(parameter, sanitizedDisplayName, description);
+		}
+
+		if (parameter.type === 'options' && parameter.enum && parameter.enum.length > 0) {
+			const sortedEnumValues = [...parameter.enum].sort((a, b) =>
+				a.localeCompare(b, undefined, { sensitivity: 'base' }),
+			);
+			const enumOptions = sortedEnumValues
+				.map((value) => {
+					const displayValue = this.nameConverter.toDisplayName(value);
+					return `\t\t\t\t\t{\n\t\t\t\t\t\tname: '${displayValue}',\n\t\t\t\t\t\tvalue: '${value}',\n\t\t\t\t\t},`;
+				})
+				.join('\n');
+
+			return `\t\t\t{
+\t\t\t\tdisplayName: '${sanitizedDisplayName}',
+\t\t\t\tname: '${parameter.name}',
+\t\t\t\ttype: 'options',
+\t\t\t\trequired: ${parameter.required},
+\t\t\t\tdefault: ${defaultValue},
+\t\t\t\toptions: [
+${enumOptions}
+\t\t\t\t],
+\t\t\t\tdescription: '${this.sanitizeDescription(description)}',
+\t\t\t},`;
+		}
+
+		if (parameter.type === 'fixedCollection') {
+			const fixedCollectionOptions = this.generateFixedCollectionEntryValues(
+				parameter.mapValueSchema,
+				'\t\t\t\t\t',
+			);
+
+			return `\t\t\t{
+\t\t\t\tdisplayName: '${sanitizedDisplayName}',
+\t\t\t\tname: '${parameter.name}',
+\t\t\t\ttype: 'fixedCollection',
+\t\t\t\trequired: ${parameter.required},
+\t\t\t\tdefault: {},
+\t\t\t\ttypeOptions: {
+\t\t\t\t\tmultipleValues: true,
+\t\t\t\t},
+\t\t\t\toptions: [
+\t\t\t\t\t{
+\t\t\t\t\t\tdisplayName: 'Field',
+\t\t\t\t\t\tname: 'entries',
+\t\t\t\t\t\tvalues: [
+${fixedCollectionOptions}
+\t\t\t\t\t\t],
+\t\t\t\t\t},
+\t\t\t\t],
+\t\t\t\tdescription: '${this.sanitizeDescription(description)}',
+\t\t\t},`;
+		}
+
+		if (parameter.type === 'collection' && parameter.schema?.properties) {
+			const collectionOptions = this.generateCollectionFieldOptions(parameter.schema, '\t\t\t\t\t');
+
+			return `\t\t\t{
+\t\t\t\tdisplayName: '${sanitizedDisplayName}',
+\t\t\t\tname: '${parameter.name}',
+\t\t\t\ttype: 'collection',
+\t\t\t\trequired: ${parameter.required},
+\t\t\t\tdefault: {},
+\t\t\t\tplaceholder: 'Add Field',
+\t\t\t\toptions: [
+${collectionOptions}
+\t\t\t\t],
+\t\t\t\tdescription: '${this.sanitizeDescription(description)}',
+\t\t\t},`;
+		}
+
+		return `\t\t\t{
+\t\t\t\tdisplayName: '${sanitizedDisplayName}',
+\t\t\t\tname: '${parameter.name}',
+\t\t\t\ttype: '${parameter.type}',
+\t\t\t\trequired: ${parameter.required},
+\t\t\t\tdefault: ${defaultValue},
+\t\t\t\tdescription: '${this.sanitizeDescription(description)}',
+\t\t\t},`;
+	}
+
+	private getParameterDefaultValue(parameter: OperationParameter): string {
+		if (parameter.default !== undefined && parameter.default !== null) {
+			return JSON.stringify(parameter.default);
+		}
+
+		if (parameter.type === 'boolean') {
+			return 'false';
+		}
+
+		if (parameter.type === 'number') {
+			return '0';
+		}
+
+		if (parameter.type === 'collection') {
+			return '{}';
+		}
+
+		if (parameter.type === 'fixedCollection') {
+			return '{}';
+		}
+
+		if (parameter.type === 'json') {
+			return `'{}'`;
+		}
+
+		if (parameter.type === 'options' && parameter.enum && parameter.enum.length > 0) {
+			return JSON.stringify(parameter.enum[0]);
+		}
+
+		return `''`;
+	}
+
+	private generateRawRequestBodyField(
+		resource: GeneratedResource,
+		operations: ResourceOperation[],
+		withBodyModeFilter: boolean,
+	): string {
+		const operationNames = operations.map((op) => `'${op.name}'`).join(', ');
+		const rawJsonFilter = withBodyModeFilter ? `\n\t\t\t\tuseRawJson: [true],` : '';
+
+		return `\t// Raw request body JSON for create/update operations
+\t{
+\t\tdisplayName: 'Request Body',
+\t\tname: 'requestBody',
+\t\ttype: 'json',
+\t\tdefault: '{}',
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],${rawJsonFilter}
+\t\t\t},
+\t\t},
+\t\tdescription: 'Request body data as JSON object',
 \t},`;
 	}
 
@@ -466,6 +921,585 @@ ${options}
 		}
 
 		return description;
+	}
+
+	private getRequiredBodyPropertyName(
+		_resourceName: string,
+		_operationName: string,
+		parameterName: string,
+	): string {
+		const safeParameterName = parameterName.replace(/[^a-zA-Z0-9]/g, '_');
+		return `requiredBody_${safeParameterName}`;
+	}
+
+	private getNodeParameterCastType(parameter: OperationParameter): string {
+		if (this.shouldConvertParameterToArray(parameter)) {
+			return 'IDataObject';
+		}
+
+		if (parameter.type === 'boolean') {
+			return 'boolean';
+		}
+
+		if (parameter.type === 'number') {
+			return 'number';
+		}
+
+		if (parameter.type === 'collection') {
+			return 'IDataObject';
+		}
+
+		if (parameter.type === 'fixedCollection') {
+			return 'IDataObject';
+		}
+
+		if (parameter.type === 'json') {
+			return 'IDataObject';
+		}
+
+		return 'string';
+	}
+
+	private serializeSchemaForCode(schema: any): string {
+		if (!schema || typeof schema !== 'object') {
+			return '{}';
+		}
+
+		return JSON.stringify(schema);
+	}
+
+	private shouldConvertParameterToArray(parameter: OperationParameter): boolean {
+		if (parameter.location !== 'body') {
+			return false;
+		}
+
+		return this.isPrimitiveArraySchema(parameter.schema);
+	}
+
+	private isPrimitiveArraySchema(schema: any): boolean {
+		if (!schema || schema.type !== 'array') {
+			return false;
+		}
+
+		const itemSchema = schema.items;
+		if (!itemSchema || typeof itemSchema !== 'object') {
+			return false;
+		}
+
+		if (Array.isArray(itemSchema.enum) && itemSchema.enum.length > 0) {
+			return true;
+		}
+
+		return ['string', 'number', 'integer', 'boolean'].includes(itemSchema.type);
+	}
+
+	private mapArrayItemToN8NType(itemSchema: any): string {
+		if (Array.isArray(itemSchema?.enum) && itemSchema.enum.length > 0) {
+			return 'options';
+		}
+
+		switch (itemSchema?.type) {
+			case 'number':
+			case 'integer':
+				return 'number';
+			case 'boolean':
+				return 'boolean';
+			default:
+				return 'string';
+		}
+	}
+
+	private generateArrayFieldValueOption(itemSchema: any, fieldIndent: string): string {
+		const fieldType = this.mapArrayItemToN8NType(itemSchema);
+		const description = this.sanitizeDescription(
+			this.formatDescription(itemSchema?.description || 'Array item value', fieldType),
+		);
+		const defaultValue = this.getSchemaDefaultValue(itemSchema, fieldType);
+
+		if (fieldType === 'options' && Array.isArray(itemSchema?.enum) && itemSchema.enum.length > 0) {
+			const enumOptions = [...itemSchema.enum]
+				.map((value: unknown) => String(value))
+				.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+				.map(
+					(value) =>
+						`${fieldIndent}\t{\n${fieldIndent}\t\tname: '${this.nameConverter.toDisplayName(
+							value,
+						)}',\n${fieldIndent}\t\tvalue: '${value}',\n${fieldIndent}\t},`,
+				)
+				.join('\n');
+
+			return `${fieldIndent}{
+${fieldIndent}\tdisplayName: 'Value',
+${fieldIndent}\tname: 'value',
+${fieldIndent}\ttype: 'options',
+${fieldIndent}\tdefault: ${defaultValue},
+${fieldIndent}\toptions: [
+${enumOptions}
+${fieldIndent}\t],
+${fieldIndent}\tdescription: '${description}',
+${fieldIndent}},`;
+		}
+
+		return `${fieldIndent}{
+${fieldIndent}\tdisplayName: 'Value',
+${fieldIndent}\tname: 'value',
+${fieldIndent}\ttype: '${fieldType}',
+${fieldIndent}\tdefault: ${defaultValue},
+${fieldIndent}\tdescription: '${description}',
+${fieldIndent}},`;
+	}
+
+	private generateRequiredArrayRequestBodyField(
+		resource: GeneratedResource,
+		parameter: OperationParameter,
+		parameterName: string,
+		operationNames: string,
+		description: string,
+	): string {
+		const values = this.generateArrayFieldValueOption(parameter.schema?.items, '\t\t\t');
+
+		return `\t// Required field: ${parameter.displayName}
+\t{
+\t\tdisplayName: '${parameter.displayName}',
+\t\tname: '${parameterName}',
+\t\ttype: 'fixedCollection',
+\t\trequired: true,
+\t\tdefault: {},
+\t\ttypeOptions: {
+\t\t\tmultipleValues: true,
+\t\t},
+\t\tdisplayOptions: {
+\t\t\tshow: {
+\t\t\t\tresource: ['${resource.name}'],
+\t\t\t\toperation: [${operationNames}],
+\t\t\t\tuseRawJson: [false],
+\t\t\t},
+\t\t},
+\t\toptions: [
+\t\t\t{
+\t\t\t\tdisplayName: 'Field',
+\t\t\t\tname: 'entries',
+\t\t\t\tvalues: [
+${values}
+\t\t\t\t],
+\t\t\t},
+\t\t],
+\t\tdescription: '${this.sanitizeDescription(description)}',
+\t},`;
+	}
+
+	private generateArrayRequestBodyFieldOption(
+		parameter: OperationParameter,
+		sanitizedDisplayName: string,
+		description: string,
+	): string {
+		const values = this.generateArrayFieldValueOption(parameter.schema?.items, '\t\t\t\t\t');
+
+		return `\t\t\t{
+\t\t\t\tdisplayName: '${sanitizedDisplayName}',
+\t\t\t\tname: '${parameter.name}',
+\t\t\t\ttype: 'fixedCollection',
+\t\t\t\trequired: ${parameter.required},
+\t\t\t\tdefault: {},
+\t\t\t\ttypeOptions: {
+\t\t\t\t\tmultipleValues: true,
+\t\t\t\t},
+\t\t\t\toptions: [
+\t\t\t\t\t{
+\t\t\t\t\t\tdisplayName: 'Field',
+\t\t\t\t\t\tname: 'entries',
+\t\t\t\t\t\tvalues: [
+${values}
+\t\t\t\t\t\t],
+\t\t\t\t\t},
+\t\t\t\t],
+\t\t\t\tdescription: '${this.sanitizeDescription(description)}',
+\t\t\t},`;
+	}
+
+	private generateCollectionFieldOptions(
+		schema: any,
+		itemIndent: string,
+		respectRequired = false,
+	): string {
+		if (!schema?.properties || typeof schema.properties !== 'object') {
+			return '';
+		}
+
+		const requiredFields = new Set<string>(Array.isArray(schema.required) ? schema.required : []);
+
+		return Object.entries(schema.properties)
+			.map(([fieldName, fieldSchema]) => ({
+				fieldName,
+				fieldSchema,
+				required: respectRequired && requiredFields.has(fieldName),
+			}))
+			.sort((a, b) => a.fieldName.localeCompare(b.fieldName))
+			.map(({ fieldName, fieldSchema, required }) =>
+				this.generateCollectionFieldOption(
+					fieldName,
+					fieldSchema,
+					required,
+					itemIndent,
+					respectRequired,
+				),
+			)
+			.filter((entry): entry is string => Boolean(entry))
+			.join('\n');
+	}
+
+	private generateCollectionFieldOption(
+		fieldName: string,
+		fieldSchema: any,
+		required: boolean,
+		itemIndent: string,
+		respectRequired: boolean,
+	): string | null {
+		const fieldType = this.mapSchemaTypeToN8NFieldType(fieldSchema);
+		if (!fieldType) {
+			return null;
+		}
+
+		const displayName = this.sanitizeDescription(this.nameConverter.toDisplayName(fieldName));
+		const description = this.sanitizeDescription(
+			this.formatDescription(fieldSchema?.description || '', fieldType),
+		);
+		const defaultValue = this.getSchemaDefaultValue(fieldSchema, fieldType);
+
+		if (
+			fieldType === 'options' &&
+			Array.isArray(fieldSchema?.enum) &&
+			fieldSchema.enum.length > 0
+		) {
+			const enumOptions = [...fieldSchema.enum]
+				.map((value: unknown) => String(value))
+				.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+				.map(
+					(value) =>
+						`${itemIndent}\t\t{\n${itemIndent}\t\t\tname: '${this.nameConverter.toDisplayName(
+							value,
+						)}',\n${itemIndent}\t\t\tvalue: '${value}',\n${itemIndent}\t\t},`,
+				)
+				.join('\n');
+
+			return `${itemIndent}{
+${itemIndent}\tdisplayName: '${displayName}',
+${itemIndent}\tname: '${fieldName}',
+${itemIndent}\ttype: 'options',
+${itemIndent}\tdefault: ${defaultValue},
+${itemIndent}\toptions: [
+${enumOptions}
+${itemIndent}\t],
+${itemIndent}\tdescription: '${description}',
+${itemIndent}},`;
+		}
+
+		if (fieldType === 'collection' && fieldSchema?.properties) {
+			const nestedOptions = this.generateCollectionFieldOptions(
+				fieldSchema,
+				`${itemIndent}\t\t`,
+				respectRequired,
+			);
+
+			return `${itemIndent}{
+${itemIndent}\tdisplayName: '${displayName}',
+${itemIndent}\tname: '${fieldName}',
+${itemIndent}\ttype: 'collection',
+${itemIndent}\tdefault: {},
+${itemIndent}\tplaceholder: 'Add Field',
+${itemIndent}\toptions: [
+${nestedOptions}
+${itemIndent}\t],
+${itemIndent}\tdescription: '${description}',
+${itemIndent}},`;
+		}
+
+		if (fieldType === 'fixedCollection') {
+			const fixedCollectionOptions = this.generateFixedCollectionEntryValues(
+				fieldSchema?.additionalProperties,
+				`${itemIndent}\t\t`,
+			);
+
+			return `${itemIndent}{
+${itemIndent}\tdisplayName: '${displayName}',
+${itemIndent}\tname: '${fieldName}',
+${itemIndent}\ttype: 'fixedCollection',
+${itemIndent}\tdefault: {},
+${itemIndent}\ttypeOptions: {
+${itemIndent}\t\tmultipleValues: true,
+${itemIndent}\t},
+${itemIndent}\toptions: [
+${itemIndent}\t\t{
+${itemIndent}\t\t\tdisplayName: 'Field',
+${itemIndent}\t\t\tname: 'entries',
+${itemIndent}\t\t\tvalues: [
+${fixedCollectionOptions}
+${itemIndent}\t\t\t],
+${itemIndent}\t\t},
+${itemIndent}\t],
+${itemIndent}\tdescription: '${description}',
+${itemIndent}},`;
+		}
+
+		return `${itemIndent}{
+${itemIndent}\tdisplayName: '${displayName}',
+${itemIndent}\tname: '${fieldName}',
+${itemIndent}\ttype: '${fieldType}',
+${itemIndent}\tdefault: ${defaultValue},
+${itemIndent}\tdescription: '${description}',
+${itemIndent}},`;
+	}
+
+	private getRequiredCollectionDefaultValue(schema: any): string {
+		const defaultObject = this.buildRequiredCollectionDefaultObject(schema);
+		if (!defaultObject || Object.keys(defaultObject).length === 0) {
+			return '{}';
+		}
+
+		return JSON.stringify(defaultObject);
+	}
+
+	private buildRequiredCollectionDefaultObject(
+		schema: any,
+		depth = 0,
+	): Record<string, unknown> | null {
+		if (depth > 5 || !schema?.properties || typeof schema.properties !== 'object') {
+			return null;
+		}
+
+		const requiredFields = Array.isArray(schema.required) ? schema.required : [];
+		if (requiredFields.length === 0) {
+			return null;
+		}
+
+		const result: Record<string, unknown> = {};
+
+		for (const fieldName of requiredFields) {
+			const fieldSchema = schema.properties[fieldName];
+			if (!fieldSchema) {
+				continue;
+			}
+
+			const fieldType = this.mapSchemaTypeToN8NFieldType(fieldSchema);
+			if (!fieldType) {
+				continue;
+			}
+
+			if (fieldType === 'collection') {
+				const nestedDefaultObject = this.buildRequiredCollectionDefaultObject(
+					fieldSchema,
+					depth + 1,
+				);
+				result[fieldName] =
+					nestedDefaultObject && Object.keys(nestedDefaultObject).length > 0
+						? nestedDefaultObject
+						: {};
+				continue;
+			}
+
+			if (fieldType === 'fixedCollection') {
+				result[fieldName] = {};
+				continue;
+			}
+
+			result[fieldName] = this.getSchemaDefaultRuntimeValue(fieldSchema, fieldType);
+		}
+
+		return result;
+	}
+
+	private getSchemaDefaultRuntimeValue(schema: any, fieldType: string): unknown {
+		if (schema?.default !== undefined && schema?.default !== null) {
+			return schema.default;
+		}
+
+		if (fieldType === 'boolean') {
+			return false;
+		}
+
+		if (fieldType === 'number') {
+			if (typeof schema?.minimum === 'number') {
+				return schema.minimum;
+			}
+			if (typeof schema?.example === 'number') {
+				return schema.example;
+			}
+			return 0;
+		}
+
+		if (fieldType === 'collection' || fieldType === 'fixedCollection' || fieldType === 'json') {
+			return {};
+		}
+
+		if (fieldType === 'options' && Array.isArray(schema?.enum) && schema.enum.length > 0) {
+			return String(schema.enum[0]);
+		}
+
+		return '';
+	}
+
+	private mapSchemaTypeToN8NFieldType(schema: any): string | null {
+		if (Array.isArray(schema?.enum) && schema.enum.length > 0) {
+			return 'options';
+		}
+
+		switch (schema?.type) {
+			case 'string':
+				return 'string';
+			case 'number':
+			case 'integer':
+				return 'number';
+			case 'boolean':
+				return 'boolean';
+			case 'object':
+				if (schema?.properties) {
+					return 'collection';
+				}
+				if (this.isSimpleAdditionalPropertiesSchema(schema?.additionalProperties)) {
+					return 'fixedCollection';
+				}
+				return 'json';
+			case 'array':
+				return 'json';
+			default:
+				if (schema?.properties) {
+					return 'collection';
+				}
+				if (this.isSimpleAdditionalPropertiesSchema(schema?.additionalProperties)) {
+					return 'fixedCollection';
+				}
+				if (schema?.items || schema?.additionalProperties) {
+					return 'json';
+				}
+				return null;
+		}
+	}
+
+	private isSimpleAdditionalPropertiesSchema(additionalProperties: any): boolean {
+		if (!additionalProperties || additionalProperties === true) {
+			return false;
+		}
+
+		if (Array.isArray(additionalProperties?.enum) && additionalProperties.enum.length > 0) {
+			return true;
+		}
+
+		return ['string', 'number', 'integer', 'boolean'].includes(additionalProperties?.type);
+	}
+
+	private generateFixedCollectionEntryValues(valueSchema: any, itemIndent: string): string {
+		const keyField = `${itemIndent}{
+${itemIndent}\tdisplayName: 'Key',
+${itemIndent}\tname: 'key',
+${itemIndent}\ttype: 'string',
+${itemIndent}\tdefault: '',
+${itemIndent}\trequired: false,
+${itemIndent}\tdescription: 'Field key',
+${itemIndent}},`;
+
+		const normalizedValueSchema =
+			valueSchema && valueSchema !== true && typeof valueSchema === 'object'
+				? valueSchema
+				: { type: 'string' };
+
+		const valueFieldType = this.mapSchemaTypeToN8NFieldType(normalizedValueSchema) || 'string';
+		const valueDescription = this.sanitizeDescription(
+			this.formatDescription(normalizedValueSchema?.description || 'Field value', valueFieldType),
+		);
+		const valueDefault = this.getSchemaDefaultValue(normalizedValueSchema, valueFieldType);
+
+		if (
+			valueFieldType === 'options' &&
+			Array.isArray(normalizedValueSchema?.enum) &&
+			normalizedValueSchema.enum.length > 0
+		) {
+			const enumOptions = [...normalizedValueSchema.enum]
+				.map((value: unknown) => String(value))
+				.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+				.map(
+					(value) =>
+						`${itemIndent}\t{\n${itemIndent}\t\tname: '${this.nameConverter.toDisplayName(
+							value,
+						)}',\n${itemIndent}\t\tvalue: '${value}',\n${itemIndent}\t},`,
+				)
+				.join('\n');
+
+			const valueField = `${itemIndent}{
+${itemIndent}\tdisplayName: 'Value',
+${itemIndent}\tname: 'value',
+${itemIndent}\ttype: 'options',
+${itemIndent}\tdefault: ${valueDefault},
+${itemIndent}\toptions: [
+${enumOptions}
+${itemIndent}\t],
+${itemIndent}\tdescription: '${valueDescription}',
+${itemIndent}},`;
+
+			return `${keyField}\n${valueField}`;
+		}
+
+		const normalizedValueFieldType =
+			valueFieldType === 'collection' || valueFieldType === 'fixedCollection'
+				? 'json'
+				: valueFieldType;
+		const normalizedDefault = this.getSchemaDefaultValue(
+			normalizedValueSchema,
+			normalizedValueFieldType,
+		);
+		const valueField = `${itemIndent}{
+${itemIndent}\tdisplayName: 'Value',
+${itemIndent}\tname: 'value',
+${itemIndent}\ttype: '${normalizedValueFieldType}',
+${itemIndent}\tdefault: ${normalizedDefault},
+${itemIndent}\tdescription: '${valueDescription}',
+${itemIndent}},`;
+
+		return `${keyField}\n${valueField}`;
+	}
+
+	private getSchemaDefaultValue(schema: any, fieldType: string): string {
+		if (schema?.default !== undefined && schema?.default !== null) {
+			return JSON.stringify(schema.default);
+		}
+
+		if (fieldType === 'boolean') {
+			return 'false';
+		}
+
+		if (fieldType === 'number') {
+			if (typeof schema?.minimum === 'number') {
+				return JSON.stringify(schema.minimum);
+			}
+			if (typeof schema?.example === 'number') {
+				return JSON.stringify(schema.example);
+			}
+			return '0';
+		}
+
+		if (fieldType === 'collection') {
+			return '{}';
+		}
+
+		if (fieldType === 'fixedCollection') {
+			return '{}';
+		}
+
+		if (fieldType === 'json') {
+			return `'{}'`;
+		}
+
+		if (fieldType === 'options' && Array.isArray(schema?.enum) && schema.enum.length > 0) {
+			return JSON.stringify(String(schema.enum[0]));
+		}
+
+		return `''`;
+	}
+
+	/**
+	 * Sort request body parameters alphabetically by field key to satisfy n8n lint rules
+	 */
+	private compareRequestBodyParameters(a: OperationParameter, b: OperationParameter): number {
+		return a.name.localeCompare(b.name);
 	}
 
 	/**

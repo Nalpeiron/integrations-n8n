@@ -73,6 +73,7 @@ export class OpenAPIParser {
 					method.toUpperCase() as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 					operation,
 					resourceInfo,
+					spec,
 				);
 
 				// Skip if operation is excluded
@@ -166,12 +167,12 @@ export class OpenAPIParser {
 
 		// For single segment (e.g., /entitlements)
 		if (segments.length === 1) {
-			return methodLower === 'get' ? 'list' : methodLower;
+			return this.getStandardOperation(methodLower, false);
 		}
 
 		// For two segments with ID (e.g., /entitlements/{id})
 		if (segments.length === 2 && segments[1].startsWith('{')) {
-			return methodLower === 'get' ? 'get' : methodLower;
+			return this.getStandardOperation(methodLower, true);
 		}
 
 		// For complex paths, create meaningful names based on path segments
@@ -254,6 +255,7 @@ export class OpenAPIParser {
 		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 		operation: OpenAPIOperation,
 		resourceInfo: { operationType: string; hasPathParams: boolean; isNestedResource: boolean },
+		spec: OpenAPISpec,
 	): ResourceOperation {
 		const parameters = this.extractParameters(operation, pathPattern);
 		const operationName = this.generateOperationName(resourceInfo.operationType, operation);
@@ -263,9 +265,11 @@ export class OpenAPIParser {
 			displayName: operationName.displayName,
 			description: operation.description || operationName.description,
 			method,
+			hasRequestBody: operation.requestBody !== undefined,
 			path: pathPattern,
 			operationId: operation.operationId,
 			parameters,
+			requestBodyParameters: this.extractRequestBodyParameters(operation, spec),
 			requestBodySchema: this.extractRequestBodySchema(operation),
 			responseSchema: this.extractResponseSchema(operation),
 			isListOperation: resourceInfo.operationType === 'list',
@@ -283,9 +287,10 @@ export class OpenAPIParser {
 	} {
 		// Use operation summary if available
 		if (operation.summary) {
+			const normalizedSummary = this.normalizeOperationSummary(operation.summary, operationType);
 			return {
-				displayName: operation.summary,
-				description: operation.description || operation.summary,
+				displayName: normalizedSummary,
+				description: operation.description || normalizedSummary,
 			};
 		}
 
@@ -303,6 +308,18 @@ export class OpenAPIParser {
 		const description = `${displayName} operation`;
 
 		return { displayName, description };
+	}
+
+	private normalizeOperationSummary(summary: string, operationType: string): string {
+		if (operationType.startsWith('update')) {
+			return summary.replace(/^patch\b/i, 'Update').replace(/^put\b/i, 'Update');
+		}
+
+		if (operationType.startsWith('create')) {
+			return summary.replace(/^post\b/i, 'Create');
+		}
+
+		return summary;
 	}
 
 	private extractParameters(
@@ -374,6 +391,306 @@ export class OpenAPIParser {
 			default:
 				return 'string';
 		}
+	}
+
+	private extractRequestBodyParameters(
+		operation: OpenAPIOperation,
+		spec: OpenAPISpec,
+	): OperationParameter[] {
+		if (!operation.requestBody || '$ref' in operation.requestBody) {
+			return [];
+		}
+
+		const requestSchema = operation.requestBody.content?.['application/json']?.schema;
+		if (!requestSchema) {
+			return [];
+		}
+
+		const resolvedSchema = this.resolveSchemaReference(requestSchema, spec, 0);
+		if (!resolvedSchema || resolvedSchema.type !== 'object' || !resolvedSchema.properties) {
+			return [];
+		}
+
+		const requiredFields = new Set<string>(
+			Array.isArray(resolvedSchema.required) ? resolvedSchema.required : [],
+		);
+		const parameters: OperationParameter[] = [];
+
+		for (const [fieldName, rawFieldSchema] of Object.entries(resolvedSchema.properties)) {
+			const fieldSchema = this.resolveSchemaReference(rawFieldSchema, spec, 1);
+			if (!fieldSchema) continue;
+
+			const n8nType = this.mapRequestBodyTypeToN8N(fieldSchema);
+			if (!n8nType) continue;
+
+			const enumValues = this.extractEnumValues(fieldSchema);
+			const mapValueSchema = this.extractMapValueSchema(fieldSchema, n8nType);
+			parameters.push({
+				name: fieldName,
+				displayName: this.nameConverter.toDisplayName(fieldName),
+				type: n8nType,
+				required: requiredFields.has(fieldName),
+				description: fieldSchema.description || '',
+				location: 'body',
+				schema: fieldSchema,
+				mapValueSchema,
+				enum: enumValues,
+				default: fieldSchema.default,
+			});
+		}
+
+		return parameters;
+	}
+
+	private resolveSchemaReference(schema: any, spec: OpenAPISpec, depth: number): any | null {
+		return this.resolveSchemaReferenceInternal(schema, spec, depth, true);
+	}
+
+	private resolveSchemaReferenceInternal(
+		schema: any,
+		spec: OpenAPISpec,
+		depth: number,
+		expandDiscriminatorMappings: boolean,
+	): any | null {
+		if (!schema || depth > 5) {
+			return null;
+		}
+
+		if (schema.$ref && typeof schema.$ref === 'string') {
+			const schemaRefPrefix = '#/components/schemas/';
+			if (!schema.$ref.startsWith(schemaRefPrefix)) {
+				return null;
+			}
+
+			const schemaName = schema.$ref.slice(schemaRefPrefix.length);
+			const resolvedSchema = spec.components?.schemas?.[schemaName];
+			if (!resolvedSchema) {
+				return null;
+			}
+
+			return this.resolveSchemaReferenceInternal(
+				resolvedSchema,
+				spec,
+				depth + 1,
+				expandDiscriminatorMappings,
+			);
+		}
+
+		if (Array.isArray(schema.oneOf) || Array.isArray(schema.anyOf)) {
+			const candidates = schema.oneOf || schema.anyOf;
+			for (const candidate of candidates) {
+				const resolvedCandidate = this.resolveSchemaReferenceInternal(
+					candidate,
+					spec,
+					depth + 1,
+					expandDiscriminatorMappings,
+				);
+				if (resolvedCandidate) {
+					return resolvedCandidate;
+				}
+			}
+		}
+
+		if (Array.isArray(schema.allOf)) {
+			const mergedSchema: any = {
+				type: 'object',
+				properties: {},
+				required: [],
+			};
+
+			for (const partialSchema of schema.allOf) {
+				const resolvedPartial = this.resolveSchemaReferenceInternal(
+					partialSchema,
+					spec,
+					depth + 1,
+					expandDiscriminatorMappings,
+				);
+				if (!resolvedPartial) continue;
+
+				if (resolvedPartial.properties) {
+					mergedSchema.properties = {
+						...mergedSchema.properties,
+						...resolvedPartial.properties,
+					};
+				}
+
+				if (Array.isArray(resolvedPartial.required)) {
+					mergedSchema.required = Array.from(
+						new Set([...mergedSchema.required, ...resolvedPartial.required]),
+					);
+				}
+
+				if (!mergedSchema.description && resolvedPartial.description) {
+					mergedSchema.description = resolvedPartial.description;
+				}
+			}
+
+			if (Object.keys(mergedSchema.properties).length > 0) {
+				if (schema.description) {
+					mergedSchema.description = schema.description;
+				}
+				return this.normalizeResolvedSchema(
+					mergedSchema,
+					spec,
+					depth + 1,
+					expandDiscriminatorMappings,
+				);
+			}
+		}
+
+		return this.normalizeResolvedSchema(schema, spec, depth + 1, expandDiscriminatorMappings);
+	}
+
+	private normalizeResolvedSchema(
+		schema: any,
+		spec: OpenAPISpec,
+		depth: number,
+		expandDiscriminatorMappings: boolean,
+	): any {
+		if (!schema || typeof schema !== 'object' || depth > 5) {
+			return schema;
+		}
+
+		const normalizedSchema: any = { ...schema };
+
+		if (
+			normalizedSchema.properties &&
+			typeof normalizedSchema.properties === 'object' &&
+			!Array.isArray(normalizedSchema.properties)
+		) {
+			const normalizedProperties: Record<string, any> = {};
+
+			for (const [propertyName, propertySchema] of Object.entries(normalizedSchema.properties)) {
+				const resolvedPropertySchema = this.resolveSchemaReferenceInternal(
+					propertySchema,
+					spec,
+					depth + 1,
+					expandDiscriminatorMappings,
+				);
+				normalizedProperties[propertyName] = resolvedPropertySchema || propertySchema;
+			}
+
+			normalizedSchema.properties = normalizedProperties;
+		}
+
+		const discriminatorMapping = normalizedSchema?.discriminator?.mapping;
+		if (
+			expandDiscriminatorMappings &&
+			discriminatorMapping &&
+			typeof discriminatorMapping === 'object' &&
+			!Array.isArray(discriminatorMapping)
+		) {
+			const mergedProperties: Record<string, any> = {
+				...(normalizedSchema.properties || {}),
+			};
+
+			for (const mappingRef of Object.values(discriminatorMapping)) {
+				if (typeof mappingRef !== 'string') {
+					continue;
+				}
+
+				const resolvedMappedSchema = this.resolveSchemaReferenceInternal(
+					{ $ref: mappingRef },
+					spec,
+					depth + 1,
+					false,
+				);
+
+				if (
+					resolvedMappedSchema?.properties &&
+					typeof resolvedMappedSchema.properties === 'object' &&
+					!Array.isArray(resolvedMappedSchema.properties)
+				) {
+					Object.assign(mergedProperties, resolvedMappedSchema.properties);
+				}
+			}
+
+			if (Object.keys(mergedProperties).length > 0) {
+				normalizedSchema.properties = mergedProperties;
+			}
+		}
+
+		if (normalizedSchema.items) {
+			const resolvedItemsSchema = this.resolveSchemaReferenceInternal(
+				normalizedSchema.items,
+				spec,
+				depth + 1,
+				expandDiscriminatorMappings,
+			);
+			if (resolvedItemsSchema) {
+				normalizedSchema.items = resolvedItemsSchema;
+			}
+		}
+
+		return normalizedSchema;
+	}
+
+	private mapRequestBodyTypeToN8N(schema: any): string | null {
+		if (Array.isArray(schema.enum) && schema.enum.length > 0) {
+			return 'options';
+		}
+
+		switch (schema.type) {
+			case 'string':
+				return 'string';
+			case 'number':
+			case 'integer':
+				return 'number';
+			case 'boolean':
+				return 'boolean';
+			case 'object':
+				if (schema?.properties) {
+					return 'collection';
+				}
+				if (this.isSimpleAdditionalPropertiesSchema(schema?.additionalProperties)) {
+					return 'fixedCollection';
+				}
+				return 'json';
+			case 'array':
+				return 'json';
+			default:
+				// Some schemas omit type but still define structured content
+				if (schema?.properties || schema?.items || schema?.additionalProperties) {
+					if (schema?.properties) {
+						return 'collection';
+					}
+					if (this.isSimpleAdditionalPropertiesSchema(schema?.additionalProperties)) {
+						return 'fixedCollection';
+					}
+					return 'json';
+				}
+				return null;
+		}
+	}
+
+	private isSimpleAdditionalPropertiesSchema(additionalProperties: any): boolean {
+		if (!additionalProperties || additionalProperties === true) {
+			return false;
+		}
+
+		if (Array.isArray(additionalProperties?.enum) && additionalProperties.enum.length > 0) {
+			return true;
+		}
+
+		return ['string', 'number', 'integer', 'boolean'].includes(additionalProperties?.type);
+	}
+
+	private extractMapValueSchema(schema: any, n8nType: string): any | undefined {
+		if (n8nType !== 'fixedCollection') {
+			return undefined;
+		}
+
+		return schema?.additionalProperties && schema.additionalProperties !== true
+			? schema.additionalProperties
+			: undefined;
+	}
+
+	private extractEnumValues(schema: any): string[] | undefined {
+		if (!Array.isArray(schema.enum) || schema.enum.length === 0) {
+			return undefined;
+		}
+
+		return schema.enum.map((value: unknown) => String(value));
 	}
 
 	private extractRequestBodySchema(operation: OpenAPIOperation): string | null {
