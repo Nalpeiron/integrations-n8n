@@ -103,7 +103,7 @@ export const customerProperties: INodeProperties[] = [
 				name: 'Request Password Action',
 				value: 'createContactsCredentialsPasswordAction',
 				description:
-					'This method allows to request setup password or reset password for selected contact. If the contact does not have credentials set up, the action will return an error. If the action is \"setup\", the contact will receive an email with a link...',
+					'This method allows to request setup password or reset password for selected contact. If the contact does not have credentials set up, the action will return an error. If the action is "setup", the contact will receive an email with a link t...',
 				action: 'Request password action',
 			},
 			{

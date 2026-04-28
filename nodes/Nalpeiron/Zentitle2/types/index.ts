@@ -8,5 +8,5 @@ export interface IResourceHandler {
 		credentials: INalpeironCredentials,
 		accessToken: string,
 		itemIndex: number,
-	): Promise<any>;
+	): Promise<unknown>;
 }

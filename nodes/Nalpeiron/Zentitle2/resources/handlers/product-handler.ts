@@ -7,7 +7,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'create':
 				return this.createProduct(executeFunctions, itemIndex);
@@ -55,7 +55,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async createProduct(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -106,7 +106,10 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listProducts(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listProducts(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -123,7 +126,10 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getProduct(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getProduct(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -137,7 +143,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async updateProduct(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(
@@ -186,7 +192,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async createAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(
@@ -248,7 +254,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async listAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -262,7 +268,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async getAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const attributeId = this.getNodeParameter(executeFunctions, 'attributeId', itemIndex) as string;
 
@@ -277,7 +283,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async updateAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const attributeId = this.getNodeParameter(executeFunctions, 'attributeId', itemIndex) as string;
 
@@ -327,7 +333,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async createEditions(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(
@@ -380,7 +386,10 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listEditions(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listEditions(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		const additionalFields = this.getNodeParameter(
@@ -399,7 +408,10 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getEditions(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getEditions(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const editionId = this.getNodeParameter(executeFunctions, 'editionId', itemIndex) as string;
 
@@ -414,7 +426,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async listEditionsAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const editionId = this.getNodeParameter(executeFunctions, 'editionId', itemIndex) as string;
 
@@ -429,7 +441,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async getEditionsAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const editionId = this.getNodeParameter(executeFunctions, 'editionId', itemIndex) as string;
 		const attributeId = this.getNodeParameter(executeFunctions, 'attributeId', itemIndex) as string;
@@ -445,7 +457,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async updateEditionsAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const editionId = this.getNodeParameter(executeFunctions, 'editionId', itemIndex) as string;
 		const attributeId = this.getNodeParameter(executeFunctions, 'attributeId', itemIndex) as string;
@@ -496,7 +508,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async listEditionsFeatures(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const editionId = this.getNodeParameter(executeFunctions, 'editionId', itemIndex) as string;
 
@@ -511,7 +523,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async getEditionsFeatures(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const editionId = this.getNodeParameter(executeFunctions, 'editionId', itemIndex) as string;
 		const featureId = this.getNodeParameter(executeFunctions, 'featureId', itemIndex) as string;
@@ -527,7 +539,7 @@ export class ProductResourceHandler extends BaseResourceHandler {
 	private async createFeatures(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(
@@ -586,7 +598,10 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listFeatures(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listFeatures(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -597,7 +612,10 @@ export class ProductResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getFeatures(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getFeatures(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const productId = this.getNodeParameter(executeFunctions, 'productId', itemIndex) as string;
 		const featureId = this.getNodeParameter(executeFunctions, 'featureId', itemIndex) as string;
 

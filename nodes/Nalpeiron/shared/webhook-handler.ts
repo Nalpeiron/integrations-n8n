@@ -1,4 +1,4 @@
-import { IWebhookFunctions, IWebhookResponseData } from 'n8n-workflow';
+import { IDataObject, IWebhookFunctions, IWebhookResponseData } from 'n8n-workflow';
 import { extractEventType, prepareResponseHeaders, prepareWebhookResponse } from './utils';
 
 export async function handleStandardWebhook(
@@ -6,7 +6,7 @@ export async function handleStandardWebhook(
 ): Promise<IWebhookResponseData> {
 	const bodyData = webhookFunctions.getBodyData();
 	const headerData = webhookFunctions.getHeaderData();
-	const queryData = webhookFunctions.getQueryData() as { [key: string]: any };
+	const queryData = webhookFunctions.getQueryData() as { [key: string]: unknown };
 
 	const events = webhookFunctions.getNodeParameter('events') as string[];
 
@@ -41,7 +41,7 @@ export async function handleStandardWebhook(
 		workflowData: [
 			[
 				{
-					json: returnData,
+					json: returnData as IDataObject,
 				},
 			],
 		],

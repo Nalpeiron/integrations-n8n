@@ -28,6 +28,8 @@ export class NalpeironZentitle2 implements INodeType {
 		properties: getAllNodeProperties(),
 	};
 
+	// this.continueOnFail() is handled by the NodeCoordinator.execute method
+	// eslint-disable-next-line @n8n/community-nodes/require-continue-on-fail
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		return await nodeCoordinator.execute(this, resourceHandlers);
 	}

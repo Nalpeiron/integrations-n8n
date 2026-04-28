@@ -7,7 +7,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'create':
 				return this.createCustomer(executeFunctions, itemIndex);
@@ -53,7 +53,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async createCustomer(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -112,7 +112,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async listCustomers(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -129,7 +129,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getCustomer(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getCustomer(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -143,7 +146,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async createContacts(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(
@@ -196,7 +199,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listContacts(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listContacts(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		const additionalFields = this.getNodeParameter(
@@ -215,7 +221,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getContacts(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getContacts(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
 
@@ -230,7 +239,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async updateContacts(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
 
@@ -280,7 +289,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async listContactsCredentials(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
 
@@ -295,7 +304,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async updateContactsCredentials(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
 
@@ -373,7 +382,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async createContactsCredentialsPasswordAction(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 		const contactId = this.getNodeParameter(executeFunctions, 'contactId', itemIndex) as string;
 
@@ -422,7 +431,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async updateDisable(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -433,7 +442,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async updateEnable(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async updateEnable(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -444,7 +456,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listEup(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listEup(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -455,7 +467,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async createNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async createNotes(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(
@@ -500,7 +515,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listNotes(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -511,7 +529,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 		const noteId = this.getNodeParameter(executeFunctions, 'noteId', itemIndex) as string;
 
@@ -523,7 +541,10 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listStats(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listStats(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const customerId = this.getNodeParameter(executeFunctions, 'customerId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
@@ -537,7 +558,7 @@ export class CustomerResourceHandler extends BaseResourceHandler {
 	private async listContactsSearch(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',

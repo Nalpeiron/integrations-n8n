@@ -267,7 +267,7 @@ export interface WebhookEventBase {
 /**
  * Complete webhook event with payload
  */
-export interface WebhookEvent<T = any> extends WebhookEventBase {
+export interface WebhookEvent<T = unknown> extends WebhookEventBase {
 	payload: T;
 }
 
@@ -280,7 +280,7 @@ export type WebhookEventCode = ${events.map((e) => `'${e.eventCode}'`).join(' | 
  * Generic payload interface for all webhook events
  */
 export interface WebhookPayload {
-	[key: string]: any;
+	[key: string]: unknown;
 }
 
 /**
@@ -339,8 +339,6 @@ export interface SeatWebhookPayload extends WebhookPayload {
 				.replace(/\s+/g, ' ')
 				// Escape single quotes for TypeScript strings
 				.replace(/'/g, "\\'")
-				// Escape double quotes
-				.replace(/"/g, '\\"')
 				// Escape backticks
 				.replace(/`/g, '\\`')
 				// Remove curly braces entirely (they cause parsing issues)

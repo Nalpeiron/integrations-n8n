@@ -7,7 +7,7 @@ export class PlanResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'create':
 				return this.createPlan(executeFunctions, itemIndex);
@@ -20,7 +20,10 @@ export class PlanResourceHandler extends BaseResourceHandler {
 		}
 	}
 
-	private async createPlan(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async createPlan(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -83,7 +86,10 @@ export class PlanResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listPlans(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listPlans(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -100,7 +106,7 @@ export class PlanResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getPlan(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getPlan(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<unknown> {
 		const planId = this.getNodeParameter(executeFunctions, 'planId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(

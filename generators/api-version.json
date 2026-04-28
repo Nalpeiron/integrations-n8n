@@ -1,8 +1,8 @@
 {
-	"lastUpdated": "2026-04-23T16:08:27.547Z",
+	"lastUpdated": "2026-04-28T11:07:53.002Z",
 	"apiSource": {
 		"url": "https://api.nalpeiron.io/openapi/v1/2025-10-10/openapi.json",
-		"version": "2025-10-10:v1.0.1969"
+		"version": "2025-10-10:v1.0.1977"
 	},
 	"components": {
 		"NalpeironZentitle2": {
@@ -10,7 +10,7 @@
 			"resourceCount": 7,
 			"n8n": {
 				"nodesApiVersion": 1,
-				"workflowVersion": "2.13.1"
+				"workflowVersion": "2.16.0"
 			},
 			"config": {
 				"methods": ["GET", "POST", "PATCH"],
@@ -29,21 +29,21 @@
 				},
 				"includedTags": ["Zentitle"]
 			},
-			"generatedAt": "2026-04-23T16:08:21.819Z"
+			"generatedAt": "2026-04-28T11:07:47.456Z"
 		},
 		"NalpeironZengain": {
 			"generatedBy": "openapi-generator",
 			"resourceCount": 1,
 			"n8n": {
 				"nodesApiVersion": 1,
-				"workflowVersion": "2.13.1"
+				"workflowVersion": "2.16.0"
 			},
 			"config": {
 				"methods": ["GET", "POST", "PATCH"],
 				"excludedResources": ["account", "insight", "product", "subscription"],
 				"includedTags": ["Zengain"]
 			},
-			"generatedAt": "2026-04-23T16:08:24.036Z"
+			"generatedAt": "2026-04-28T11:07:49.003Z"
 		},
 		"NalpeironZentitle2Trigger": {
 			"generatedBy": "webhook-generator",
@@ -51,7 +51,7 @@
 			"config": {
 				"includedTags": ["Zentitle"]
 			},
-			"generatedAt": "2026-04-23T16:08:25.577Z"
+			"generatedAt": "2026-04-28T11:07:51.111Z"
 		},
 		"NalpeironZengainTrigger": {
 			"generatedBy": "webhook-generator",
@@ -59,7 +59,7 @@
 			"config": {
 				"includedTags": ["Zengain"]
 			},
-			"generatedAt": "2026-04-23T16:08:27.547Z"
+			"generatedAt": "2026-04-28T11:07:53.002Z"
 		}
 	}
 }

@@ -7,7 +7,7 @@ export class AttributeResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'create':
 				return this.createAttribute(executeFunctions, itemIndex);
@@ -23,7 +23,7 @@ export class AttributeResourceHandler extends BaseResourceHandler {
 	private async createAttribute(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -83,7 +83,7 @@ export class AttributeResourceHandler extends BaseResourceHandler {
 	private async listAttributes(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -100,7 +100,10 @@ export class AttributeResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getAttribute(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getAttribute(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const attributeId = this.getNodeParameter(executeFunctions, 'attributeId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(

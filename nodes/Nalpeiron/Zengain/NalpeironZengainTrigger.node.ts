@@ -48,6 +48,7 @@ export class NalpeironZengainTrigger implements INodeType {
 				options: WEBHOOK_EVENT_OPTIONS,
 			},
 		],
+		usableAsTool: true,
 	};
 
 	async webhook(this: IWebhookFunctions): Promise<IWebhookResponseData> {
