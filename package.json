@@ -27,12 +27,14 @@
 		"node": ">=20.15"
 	},
 	"scripts": {
-		"build": "npx rimraf dist && tsc && gulp build:icons",
-		"dev": "tsc --watch",
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
 		"format": "prettier nodes credentials generators --write",
-		"lint": "eslint nodes credentials package.json",
-		"lint:fix": "eslint nodes credentials package.json --fix",
-		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"prepublishOnly": "n8n-node prerelease",
+		"release": "n8n-node release",
 		"generate:all": "npm run generate:actions && npm run generate:webhooks && npm run lint:fix && npm run format",
 		"generate:actions": "npm run generate:actions:zentitle && npm run generate:actions:zengain",
 		"generate:actions:zentitle": "npx ts-node generators/openapi-generator.ts --product zentitle",
@@ -57,14 +59,14 @@
 		]
 	},
 	"devDependencies": {
+		"@n8n/node-cli": "0.27.0",
 		"@types/node": "^22.15.30",
-		"@typescript-eslint/parser": "~8.32.0",
-		"eslint": "^8.57.0",
-		"eslint-plugin-n8n-nodes-base": "^1.16.4",
-		"gulp": "^5.0.0",
+		"@typescript-eslint/parser": "8.59.0",
+		"eslint": "9.39.4",
 		"prettier": "^3.5.3",
+		"release-it": "20.0.1",
 		"ts-node": "^10.9.2",
-		"typescript": "^5.8.2"
+		"typescript": "5.9.3"
 	},
 	"peerDependencies": {
 		"n8n-workflow": "*"
