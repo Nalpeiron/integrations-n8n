@@ -14,10 +14,5 @@
 				"url": "https://api.nalpeiron.io/docs"
 			}
 		]
-	},
-	"subcategories": {
-		"Analytics & Tracking": ["Growth Analytics", "User Analytics"],
-		"Developer Tools": ["API"],
-		"CRM": ["Customer Management", "Subscription Management"]
 	}
 }

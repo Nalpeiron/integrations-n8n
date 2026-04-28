@@ -14,10 +14,5 @@
 				"url": "https://docs.nalpeiron.com/zentitle2-docs/ui-administration/webhooks"
 			}
 		]
-	},
-	"subcategories": {
-		"Analytics & Tracking": ["Growth Analytics", "User Analytics"],
-		"Developer Tools": ["Webhooks", "API"],
-		"CRM": ["Customer Management", "Subscription Management"]
 	}
 }
