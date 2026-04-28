@@ -6,13 +6,15 @@ interface NalpeironWebhook {
 	uri?: string;
 }
 
-function getWebhookList(webhooksResponse: any): NalpeironWebhook[] {
-	if (Array.isArray(webhooksResponse?.data)) {
-		return webhooksResponse.data;
+function getWebhookList(webhooksResponse: unknown): NalpeironWebhook[] {
+	const response = webhooksResponse as { data?: unknown };
+
+	if (Array.isArray(response.data)) {
+		return response.data as NalpeironWebhook[];
 	}
 
 	if (Array.isArray(webhooksResponse)) {
-		return webhooksResponse;
+		return webhooksResponse as NalpeironWebhook[];
 	}
 
 	return [];
@@ -35,7 +37,7 @@ export const createWebhookMethods = () => ({
 				}
 
 				return exists;
-			} catch (error) {
+			} catch {
 				return false;
 			}
 		},
@@ -56,7 +58,12 @@ export const createWebhookMethods = () => ({
 					subscriptions: events,
 				};
 
-				const webhook = await makeWebhookRequest(this, 'POST', '/api/v1/account/webhooks', body);
+				const webhook = (await makeWebhookRequest(
+					this,
+					'POST',
+					'/api/v1/account/webhooks',
+					body,
+				)) as NalpeironWebhook;
 
 				if (webhook && webhook.id) {
 					const staticData = this.getWorkflowStaticData('node');
@@ -101,7 +108,7 @@ export const createWebhookMethods = () => ({
 				delete legacyStaticData.webhookId;
 
 				return true;
-			} catch (error) {
+			} catch {
 				return false;
 			}
 		},

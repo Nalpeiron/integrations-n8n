@@ -99,7 +99,7 @@ import { makeAuthenticatedRequest } from '../../../shared/utils';`;
 		let method = `\tprivate async ${finalMethodName}(\n`;
 		method += `\t\texecuteFunctions: IExecuteFunctions,\n`;
 		method += `\t\titemIndex: number,\n`;
-		method += `\t): Promise<any> {\n`;
+		method += `\t): Promise<unknown> {\n`;
 
 		// Extract path parameters
 		if (pathParams.length > 0) {
@@ -1518,8 +1518,6 @@ ${itemIndent}},`;
 				.replace(/\\/g, '\\\\')
 				// Escape single quotes for TypeScript strings
 				.replace(/'/g, "\\'")
-				// Escape double quotes
-				.replace(/"/g, '\\"')
 				// Escape backticks
 				.replace(/`/g, '\\`')
 				// Remove curly braces entirely (they cause parsing issues)

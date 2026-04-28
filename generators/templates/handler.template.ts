@@ -5,7 +5,7 @@ export class {{className}} extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 {{operations}}
 			default:

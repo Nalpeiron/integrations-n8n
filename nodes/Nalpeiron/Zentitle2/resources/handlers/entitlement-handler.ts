@@ -7,7 +7,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'list':
 				return this.listEntitlements(executeFunctions, itemIndex);
@@ -81,7 +81,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async listEntitlements(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -101,7 +101,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async getEntitlement(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -127,7 +127,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateEntitlement(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -188,7 +188,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateActivate(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -206,7 +206,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async listActivations(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -232,7 +232,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async listActivationsLog(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -258,7 +258,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateChangeOffering(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -318,7 +318,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateDisable(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -333,7 +333,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async updateEnable(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async updateEnable(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -351,7 +354,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateFeatureReset(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -367,7 +370,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async createNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async createNotes(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -416,7 +422,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listNotes(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -431,7 +440,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getNotes(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -450,7 +459,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async createProvision(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -465,7 +474,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async updateRenew(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async updateRenew(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -483,7 +495,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateResetOverrides(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementId',
@@ -554,7 +566,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async createActivations(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -668,7 +680,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateActivations(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -714,7 +726,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async getActivations(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const activationId = this.getNodeParameter(
 			executeFunctions,
 			'activationId',
@@ -732,7 +744,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateActivationsFeaturesCheckout(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const activationId = this.getNodeParameter(
 			executeFunctions,
 			'activationId',
@@ -790,7 +802,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateActivationsFeaturesReturn(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const activationId = this.getNodeParameter(
 			executeFunctions,
 			'activationId',
@@ -845,7 +857,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async createGroups(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async createGroups(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -896,7 +911,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listGroups(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listGroups(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -913,7 +931,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getGroups(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getGroups(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -936,7 +957,10 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async updateGroups(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async updateGroups(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -989,7 +1013,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateGroupsActivationCodesAdd(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -1051,7 +1075,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateGroupsActivationCodesGenerate(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -1103,7 +1127,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async updateGroupsActivationCodesRemove(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -1165,7 +1189,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async createGroupsAuthorizedContacts(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -1217,7 +1241,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async listGroupsAuthorizedContacts(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -1243,7 +1267,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async createGroupsExtend(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const entitlementGroupId = this.getNodeParameter(
 			executeFunctions,
 			'entitlementGroupId',
@@ -1295,7 +1319,7 @@ export class EntitlementResourceHandler extends BaseResourceHandler {
 	private async createGroupsFind(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',

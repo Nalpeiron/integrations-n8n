@@ -6,7 +6,7 @@ export abstract class BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any>;
+	): Promise<unknown>;
 
 	/**
 	 * Get a node parameter value
@@ -15,8 +15,8 @@ export abstract class BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		parameterName: string,
 		itemIndex: number,
-		fallbackValue?: any,
-	): any {
+		fallbackValue?: unknown,
+	): unknown {
 		return executeFunctions.getNodeParameter(parameterName, itemIndex, fallbackValue);
 	}
 

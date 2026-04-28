@@ -10,7 +10,7 @@ export class NalpeironOAuth2Api implements ICredentialType {
 	displayName = 'Nalpeiron OAuth2 API';
 	documentationUrl = 'https://api.nalpeiron.io/docs';
 	extends = ['oAuth2Api'];
-
+	icon = 'file:nalpeiron.svg' as const;
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Access Token URL',

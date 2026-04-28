@@ -7,7 +7,7 @@ export class OfferingResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'create':
 				return this.createOffering(executeFunctions, itemIndex);
@@ -25,7 +25,7 @@ export class OfferingResourceHandler extends BaseResourceHandler {
 	private async createOffering(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -114,7 +114,7 @@ export class OfferingResourceHandler extends BaseResourceHandler {
 	private async listOfferings(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -131,7 +131,10 @@ export class OfferingResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getOffering(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getOffering(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const offeringId = this.getNodeParameter(executeFunctions, 'offeringId', itemIndex) as string;
 
 		const additionalFields = this.getNodeParameter(
@@ -153,7 +156,7 @@ export class OfferingResourceHandler extends BaseResourceHandler {
 	private async updateOffering(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const offeringId = this.getNodeParameter(executeFunctions, 'offeringId', itemIndex) as string;
 
 		const useRawJson = this.getNodeParameter(

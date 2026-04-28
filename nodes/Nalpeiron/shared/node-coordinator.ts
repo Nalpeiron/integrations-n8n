@@ -1,4 +1,4 @@
-import type { IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
+import type { IDataObject, IExecuteFunctions, INodeExecutionData } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 import { BaseResourceHandler } from './base-resource-handler';
 
@@ -29,7 +29,7 @@ export class NodeCoordinator implements INodeCoordinator {
 			try {
 				const result = await this.executeItemOperation(context, i, resourceHandlers);
 				returnData.push({
-					json: result,
+					json: result as IDataObject,
 					pairedItem: {
 						item: i,
 					},
@@ -58,7 +58,7 @@ export class NodeCoordinator implements INodeCoordinator {
 		context: IExecuteFunctions,
 		itemIndex: number,
 		resourceHandlers: Record<string, BaseResourceHandler>,
-	): Promise<any> {
+	): Promise<unknown> {
 		const resource = context.getNodeParameter('resource', itemIndex) as string;
 		const operation = context.getNodeParameter('operation', itemIndex) as string;
 

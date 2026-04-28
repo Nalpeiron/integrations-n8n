@@ -21,7 +21,7 @@ export async function makeAuthenticatedRequest(
 	endpoint: string,
 	body?: IDataObject,
 	qs?: IDataObject,
-): Promise<any> {
+): Promise<unknown> {
 	const credentials = (await context.getCredentials('nalpeironOAuth2Api')) as INalpeironCredentials;
 
 	const options: IHttpRequestOptions = {
@@ -58,7 +58,7 @@ export async function makeWebhookRequest(
 	method: 'GET' | 'POST' | 'PUT' | 'DELETE',
 	endpoint: string,
 	body?: IDataObject,
-): Promise<any> {
+): Promise<unknown> {
 	return makeAuthenticatedRequest(context, method, endpoint, body);
 }
 
@@ -76,7 +76,7 @@ export function prepareResponseHeaders(): { [key: string]: string } {
 /**
  * Extract event type from webhook body data
  */
-export function extractEventType(bodyData: any): string {
+export function extractEventType(bodyData: { [key: string]: unknown }): string {
 	return String(bodyData?.eventCode || bodyData?.event || bodyData?.type || 'unknown');
 }
 
@@ -84,11 +84,11 @@ export function extractEventType(bodyData: any): string {
  * Prepare webhook response data
  */
 export function prepareWebhookResponse(
-	bodyData: any,
-	headerData: any,
-	queryData: any,
+	bodyData: unknown,
+	headerData: unknown,
+	queryData: unknown,
 	eventType: string,
-): any {
+): unknown {
 	const propertyName = 'data';
 	return {
 		[propertyName]: bodyData,

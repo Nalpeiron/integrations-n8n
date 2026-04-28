@@ -7,7 +7,7 @@ export class FeatureResourceHandler extends BaseResourceHandler {
 		executeFunctions: IExecuteFunctions,
 		operation: string,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		switch (operation) {
 			case 'create':
 				return this.createFeature(executeFunctions, itemIndex);
@@ -23,7 +23,7 @@ export class FeatureResourceHandler extends BaseResourceHandler {
 	private async createFeature(
 		executeFunctions: IExecuteFunctions,
 		itemIndex: number,
-	): Promise<any> {
+	): Promise<unknown> {
 		const useRawJson = this.getNodeParameter(
 			executeFunctions,
 			'useRawJson',
@@ -80,7 +80,10 @@ export class FeatureResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async listFeatures(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async listFeatures(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const additionalFields = this.getNodeParameter(
 			executeFunctions,
 			'additionalFields',
@@ -97,7 +100,10 @@ export class FeatureResourceHandler extends BaseResourceHandler {
 		);
 	}
 
-	private async getFeature(executeFunctions: IExecuteFunctions, itemIndex: number): Promise<any> {
+	private async getFeature(
+		executeFunctions: IExecuteFunctions,
+		itemIndex: number,
+	): Promise<unknown> {
 		const featureId = this.getNodeParameter(executeFunctions, 'featureId', itemIndex) as string;
 
 		return await makeAuthenticatedRequest(
